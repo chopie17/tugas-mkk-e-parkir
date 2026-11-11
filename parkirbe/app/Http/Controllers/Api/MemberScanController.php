@@ -11,9 +11,9 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 /**
- * MemberScanController memproses scan kartu QR member di pintu masuk.
+ * MemberScanController memproses scan kartu QR / plat member di pintu masuk dan pintu keluar.
  *
- * POST /members/scan  → kirim {member_code}
+ * POST /members/scan  → kirim {member_code, direction?: 'in'|'out'}
  */
 class MemberScanController extends Controller
 {
@@ -23,19 +23,20 @@ class MemberScanController extends Controller
 
     /**
      * Proses scan kartu member.
-     * Mengembalikan status izin masuk, alasan, dan data member.
-     *
-     * @param Request $request
-     * @return JsonResponse HTTP 200 (allowed) | HTTP 422 (denied)
+     * Mengembalikan status izin, alasan, arah, dan data member.
      */
     public function scan(Request $request): JsonResponse
     {
         $request->validate([
             'member_code' => 'required|string|max:50',
+            'direction'   => 'nullable|string|in:in,out',
         ]);
 
+        $direction = $request->input('direction', 'in');
+
         $result = $this->scanService->scan(
-            $request->string('member_code')->toString()
+            $request->string('member_code')->toString(),
+            $direction
         );
 
         $statusCode = $result['allowed'] ? 200 : 422;

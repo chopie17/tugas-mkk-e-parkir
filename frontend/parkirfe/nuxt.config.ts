@@ -3,7 +3,13 @@ import tailwindcss from '@tailwindcss/vite'
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
   compatibilityDate: '2025-07-15',
-  devtools: { enabled: true },
+  telemetry: false,
+  devtools: { enabled: false },
+
+  devServer: {
+    host: '0.0.0.0',
+    port: 3000,
+  },
 
   // Module dependencies
   modules: ['@pinia/nuxt', '@vueuse/nuxt'],
@@ -19,7 +25,7 @@ export default defineNuxtConfig({
   // Runtime config — override di .env
   runtimeConfig: {
     public: {
-      apiBase: process.env.NUXT_PUBLIC_API_BASE || 'http://localhost:8000/api',
+      apiBase: process.env.NUXT_PUBLIC_API_BASE || 'http://192.168.1.9:8000/api',
     },
   },
 
@@ -35,7 +41,7 @@ export default defineNuxtConfig({
       link: [
         { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
         { rel: 'preconnect', href: 'https://fonts.gstatic.com', crossorigin: '' },
-        { rel: 'stylesheet', href: 'https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap' },
+        { rel: 'stylesheet', href: 'https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap' },
       ],
     },
     pageTransition: { name: 'page', mode: 'out-in' },

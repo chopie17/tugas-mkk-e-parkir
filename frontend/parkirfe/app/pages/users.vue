@@ -3,24 +3,24 @@
     <!-- Header -->
     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
       <div>
-        <h1 class="text-2xl font-bold tracking-tight text-white">Manajemen Akun Pengguna</h1>
-        <p class="text-xs text-slate-400 mt-1">Kelola hak akses petugas loket operasional dan administrator sistem</p>
+        <h1 class="text-2xl font-black tracking-tight text-[#0a0a0a]">Manajemen Akun Pengguna</h1>
+        <p class="text-xs text-[var(--nb-muted)] mt-1 font-medium">Kelola hak akses petugas loket operasional dan administrator sistem</p>
       </div>
 
-      <button class="btn btn-primary shadow-lg shadow-blue-600/20" @click="openForm()">
+      <button class="nb-btn bg-[var(--nb-lime)] text-[#0a0a0a] font-bold border-2 border-black shadow-[3px_3px_0_#0a0a0a] hover:bg-[#d4f028]" @click="openForm()">
         <AppIcon name="plus" class="w-4 h-4" />
         <span>Tambah Pengguna Baru</span>
       </button>
     </div>
 
     <!-- Table -->
-    <div class="glass-card overflow-hidden">
-      <div class="px-6 py-4 border-b border-slate-800/80 flex items-center justify-between">
+    <div class="nb-card bg-white border-2 border-black shadow-[4px_4px_0_#0a0a0a] overflow-hidden">
+      <div class="px-6 py-4 border-b-2 border-black flex items-center justify-between bg-[var(--nb-yellow)]/20">
         <div class="flex items-center gap-2">
-          <AppIcon name="user" class="w-4 h-4 text-slate-400" />
-          <h2 class="text-sm font-semibold text-white">Daftar Akun Petugas & Administrator</h2>
+          <AppIcon name="user" class="w-4 h-4 text-black" />
+          <h2 class="text-sm font-black text-black">Daftar Akun Petugas & Administrator</h2>
         </div>
-        <span class="text-xs text-slate-400 font-mono">{{ users.length }} akun</span>
+        <span class="text-xs text-black font-mono font-bold bg-white px-2.5 py-0.5 rounded-full border-2 border-black shadow-[1px_1px_0_#0a0a0a]">{{ users.length }} akun</span>
       </div>
 
       <div class="overflow-x-auto">
@@ -37,9 +37,9 @@
           </thead>
           <tbody>
             <tr v-if="loading">
-              <td colspan="6" class="text-center py-12 text-slate-500 text-xs">
+              <td colspan="6" class="text-center py-12 text-[var(--nb-muted)] text-xs">
                 <div class="flex items-center justify-center gap-2">
-                  <svg class="w-4 h-4 animate-spin text-blue-500" fill="none" viewBox="0 0 24 24">
+                  <svg class="w-4 h-4 animate-spin text-black" fill="none" viewBox="0 0 24 24">
                     <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
                     <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
                   </svg>
@@ -51,37 +51,37 @@
             <tr v-for="u in users" :key="u.id">
               <td>
                 <div class="flex items-center gap-2.5">
-                  <div class="w-8 h-8 rounded-lg bg-gradient-to-tr from-slate-800 to-slate-700 flex items-center justify-center text-xs font-bold text-slate-200">
+                  <div class="w-8 h-8 rounded-lg bg-[var(--nb-purple)] border-2 border-black flex items-center justify-center text-xs font-black text-white shadow-[1px_1px_0_#0a0a0a]">
                     {{ u.name?.charAt(0).toUpperCase() || 'U' }}
                   </div>
                   <div>
-                    <p class="font-semibold text-white">{{ u.name }}</p>
-                    <span v-if="u.id === authStore.user?.id" class="text-[10px] text-blue-400 font-medium">Akun Anda Saat Ini</span>
+                    <p class="font-bold text-[#0a0a0a]">{{ u.name }}</p>
+                    <span v-if="u.id === authStore.user?.id" class="text-[10px] text-black font-bold px-1 rounded bg-[var(--nb-lime)] border border-black inline-block mt-0.5">Akun Anda Saat Ini</span>
                   </div>
                 </div>
               </td>
               <td>
-                <span class="font-mono text-xs font-semibold px-2 py-0.5 rounded bg-slate-800/80 text-blue-300 border border-slate-700/60">
+                <span class="font-mono text-xs font-bold px-2 py-0.5 rounded bg-[var(--nb-bg)] text-black border-2 border-black shadow-[1px_1px_0_#0a0a0a]">
                   {{ u.username }}
                 </span>
               </td>
-              <td class="text-xs text-slate-300">{{ u.email }}</td>
+              <td class="text-xs text-[var(--nb-ink)] font-medium">{{ u.email }}</td>
               <td>
                 <span
-                  class="inline-flex items-center gap-1.5 text-xs px-2.5 py-0.5 rounded-full font-medium"
+                  class="inline-flex items-center gap-1.5 text-xs px-2.5 py-0.5 rounded-full font-bold border-2 border-black shadow-[1px_1px_0_#0a0a0a]"
                   :class="u.role === 'super_admin'
-                    ? 'bg-purple-500/15 text-purple-300 border border-purple-500/30'
-                    : 'bg-blue-500/15 text-blue-300 border border-blue-500/30'"
+                    ? 'bg-[var(--nb-purple)] text-white'
+                    : 'bg-[var(--nb-teal)]/30 text-black'"
                 >
                   <AppIcon :name="u.role === 'super_admin' ? 'shield' : 'user'" class="w-3.5 h-3.5" />
                   <span>{{ u.role === 'super_admin' ? 'Super Admin' : 'Petugas' }}</span>
                 </span>
               </td>
-              <td class="text-xs font-mono text-slate-400">{{ formatDate(u.created_at) }}</td>
+              <td class="text-xs font-mono text-[var(--nb-ink)] font-medium">{{ formatDate(u.created_at) }}</td>
               <td class="text-right">
                 <div class="inline-flex items-center gap-2">
                   <button
-                    class="btn btn-secondary text-xs py-1 px-2.5"
+                    class="nb-btn bg-white text-black border-2 border-black shadow-[2px_2px_0_#0a0a0a] text-xs font-bold py-1 px-2.5 hover:bg-gray-100"
                     @click="openForm(u)"
                     title="Edit Akun"
                   >
@@ -90,7 +90,7 @@
                   </button>
                   <button
                     v-if="u.id !== authStore.user?.id"
-                    class="btn btn-danger text-xs py-1 px-2.5"
+                    class="nb-btn bg-rose-100 text-rose-900 border-2 border-black shadow-[2px_2px_0_#0a0a0a] text-xs font-bold py-1 px-2.5 hover:bg-rose-200"
                     @click="deleteUser(u)"
                     title="Hapus Akun"
                   >
@@ -109,66 +109,68 @@
     <Teleport to="body">
       <div
         v-if="showForm"
-        class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-sm"
+        class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs"
       >
-        <div class="glass-card w-full max-w-md p-6 space-y-5 bg-[#0d1322] border-slate-700 shadow-2xl animate-fade-in">
-          <div class="flex items-center justify-between pb-3 border-b border-slate-800">
+        <div class="nb-modal bg-white border-3 border-black shadow-[8px_8px_0_#0a0a0a] w-full max-w-md p-6 space-y-5 animate-fade-in">
+          <div class="flex items-center justify-between pb-3 border-b-2 border-black">
             <div class="flex items-center gap-2">
-              <AppIcon name="user" class="w-5 h-5 text-blue-400" />
-              <h2 class="text-base font-bold text-white">{{ editing ? 'Edit Data Pengguna' : 'Tambah Pengguna Baru' }}</h2>
+              <div class="w-8 h-8 rounded-lg bg-[var(--nb-lime)] border-2 border-black flex items-center justify-center">
+                <AppIcon name="user" class="w-4 h-4 text-black" />
+              </div>
+              <h2 class="text-base font-black text-black">{{ editing ? 'Edit Data Pengguna' : 'Tambah Pengguna Baru' }}</h2>
             </div>
-            <button class="p-1 text-slate-400 hover:text-white rounded-lg transition-colors" @click="showForm = false">
+            <button class="p-1 text-black hover:bg-black/10 rounded-md transition-colors" @click="showForm = false">
               <AppIcon name="close" class="w-4 h-4" />
             </button>
           </div>
 
           <div class="space-y-4">
             <div>
-              <label class="form-label">Nama Lengkap</label>
-              <input v-model="form.name" type="text" class="form-input" placeholder="Misal: Andi Prasetyo" required />
+              <label class="form-label text-black font-bold">Nama Lengkap</label>
+              <input v-model="form.name" type="text" class="form-input bg-white border-2 border-black rounded-xl shadow-[2px_2px_0_#0a0a0a]" placeholder="Misal: Andi Prasetyo" required />
             </div>
 
             <div class="grid grid-cols-2 gap-3">
               <div>
-                <label class="form-label">Username</label>
-                <input v-model="form.username" type="text" class="form-input font-mono" placeholder="petugas2" required />
+                <label class="form-label text-black font-bold">Username</label>
+                <input v-model="form.username" type="text" class="form-input font-mono bg-white border-2 border-black rounded-xl shadow-[2px_2px_0_#0a0a0a]" placeholder="petugas2" required />
               </div>
               <div>
-                <label class="form-label">Email</label>
-                <input v-model="form.email" type="email" class="form-input" placeholder="andi@parkir.test" required />
+                <label class="form-label text-black font-bold">Email</label>
+                <input v-model="form.email" type="email" class="form-input bg-white border-2 border-black rounded-xl shadow-[2px_2px_0_#0a0a0a]" placeholder="andi@parkir.test" required />
               </div>
             </div>
 
             <div>
-              <label class="form-label">
+              <label class="form-label text-black font-bold">
                 Password {{ editing ? '(Kosongkan jika tidak diganti)' : '' }}
               </label>
               <input
                 v-model="form.password"
                 type="password"
-                class="form-input"
+                class="form-input bg-white border-2 border-black rounded-xl shadow-[2px_2px_0_#0a0a0a]"
                 placeholder="Minimal 8 karakter"
                 :required="!editing"
               />
             </div>
 
             <div>
-              <label class="form-label">Hak Akses (Role)</label>
-              <select v-model="form.role" class="form-input">
+              <label class="form-label text-black font-bold">Hak Akses (Role)</label>
+              <select v-model="form.role" class="form-input bg-white border-2 border-black rounded-xl shadow-[2px_2px_0_#0a0a0a] font-medium">
                 <option value="petugas">Petugas Loket Operasional</option>
                 <option value="super_admin">Super Administrator (Akses Penuh)</option>
               </select>
             </div>
           </div>
 
-          <div v-if="formError" class="p-3 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-300 text-xs">
+          <div v-if="formError" class="p-3 rounded-xl bg-rose-100 border-2 border-black text-rose-900 text-xs font-bold shadow-[2px_2px_0_#0a0a0a]">
             {{ formError }}
           </div>
 
           <div class="flex gap-3 pt-2">
-            <button class="btn btn-ghost flex-1 text-xs" @click="showForm = false">Batal</button>
+            <button class="nb-btn bg-white text-black flex-1 text-xs font-bold border-2 border-black shadow-[2px_2px_0_#0a0a0a] hover:bg-gray-100" @click="showForm = false">Batal</button>
             <button
-              class="btn btn-primary flex-1 text-xs font-semibold"
+              class="nb-btn bg-[var(--nb-lime)] text-black flex-1 text-xs font-black border-2 border-black shadow-[2px_2px_0_#0a0a0a] hover:bg-[#d4f028]"
               @click="saveUser"
               :disabled="saving"
             >

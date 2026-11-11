@@ -1,21 +1,21 @@
 <template>
   <div class="w-full max-w-md">
     <!-- Back button -->
-    <div class="mb-6">
+    <div class="mb-5">
       <NuxtLink
         to="/login"
-        class="inline-flex items-center gap-2 text-xs font-medium text-slate-400 hover:text-blue-400 transition-colors"
+        class="inline-flex items-center gap-2 text-xs font-bold text-[#0a0a0a] hover:text-[var(--nb-purple,#6c47ff)] transition-colors px-3 py-1.5 rounded-full bg-white border-2 border-[#0a0a0a] shadow-[2px_2px_0_#0a0a0a]"
       >
-        <AppIcon name="arrow-left" class="w-4 h-4" />
-        <span>Kembali ke Halaman Login</span>
+        <AppIcon name="arrow-left" class="w-3.5 h-3.5" />
+        <span>Kembali ke Login</span>
       </NuxtLink>
     </div>
 
     <!-- Header -->
     <div class="text-center mb-6">
-      <h1 class="text-2xl font-bold tracking-tight text-white">Pemulihan Akun</h1>
-      <p class="text-sm text-slate-400 mt-1">
-        {{ step === 1 ? 'Masukkan email akun petugas Anda untuk menerima token pemulihan' : 'Masukkan kode token dan buat password baru' }}
+      <h1 class="text-2xl sm:text-3xl font-extrabold tracking-tight text-[#0a0a0a]">Pemulihan Akun</h1>
+      <p class="text-xs sm:text-sm text-[var(--nb-muted)] mt-1 font-medium">
+        {{ step === 1 ? 'Masukkan email akun petugas untuk menerima token pemulihan' : 'Masukkan token dan buat password baru' }}
       </p>
     </div>
 
@@ -23,56 +23,56 @@
     <div class="flex items-center justify-center gap-3 mb-6">
       <div class="flex items-center gap-2">
         <span
-          class="w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold"
-          :class="step >= 1 ? 'bg-blue-600 text-white shadow-md shadow-blue-500/20' : 'bg-slate-800 text-slate-500'"
+          class="w-7 h-7 rounded-full flex items-center justify-center text-xs font-black border-2 border-[#0a0a0a]"
+          :class="step >= 1 ? 'bg-[var(--nb-lime,#e4ff3a)] text-[#0a0a0a] shadow-[2px_2px_0_#0a0a0a]' : 'bg-white text-slate-400'"
         >1</span>
-        <span class="text-xs font-medium" :class="step >= 1 ? 'text-slate-200' : 'text-slate-500'">Minta Token</span>
+        <span class="text-xs font-bold" :class="step >= 1 ? 'text-[#0a0a0a]' : 'text-slate-400'">Minta Token</span>
       </div>
-      <div class="w-8 h-px bg-slate-800"></div>
+      <div class="w-8 h-0.5 bg-[#0a0a0a]"></div>
       <div class="flex items-center gap-2">
         <span
-          class="w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold"
-          :class="step >= 2 ? 'bg-blue-600 text-white shadow-md shadow-blue-500/20' : 'bg-slate-800 text-slate-500'"
+          class="w-7 h-7 rounded-full flex items-center justify-center text-xs font-black border-2 border-[#0a0a0a]"
+          :class="step >= 2 ? 'bg-[var(--nb-lime,#e4ff3a)] text-[#0a0a0a] shadow-[2px_2px_0_#0a0a0a]' : 'bg-white text-slate-400'"
         >2</span>
-        <span class="text-xs font-medium" :class="step >= 2 ? 'text-slate-200' : 'text-slate-500'">Reset Password</span>
+        <span class="text-xs font-bold" :class="step >= 2 ? 'text-[#0a0a0a]' : 'text-slate-400'">Reset Password</span>
       </div>
     </div>
 
     <!-- Main Card -->
-    <div class="glass-card p-6 sm:p-8">
+    <div class="nb-card p-6 sm:p-8 bg-white border-2 border-black shadow-[6px_6px_0_#0a0a0a] rounded-3xl">
       <!-- Step 1: Request Token -->
-      <form v-if="step === 1" @submit.prevent="requestToken" class="space-y-5">
+      <form v-if="step === 1" @submit.prevent="requestToken" class="space-y-4">
         <div>
-          <label class="form-label">Email Terdaftar</label>
+          <label class="form-label font-bold text-xs">Email Terdaftar</label>
           <div class="relative">
-            <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-500">
-              <AppIcon name="mail" class="w-4 h-4" />
+            <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+              <AppIcon name="mail" class="w-4 h-4 text-black" />
             </div>
             <input
               v-model="email"
               type="email"
-              class="form-input pl-10"
+              class="form-input pl-10 border-2 border-black rounded-xl shadow-[3px_3px_0_#0a0a0a]"
               placeholder="nama@parkir.test"
               required
             />
           </div>
         </div>
 
-        <div v-if="errorMsg" class="p-3.5 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-300 text-sm flex items-start gap-2">
-          <AppIcon name="alert-triangle" class="w-4 h-4 text-rose-400 shrink-0 mt-0.5" />
+        <div v-if="errorMsg" class="p-3.5 rounded-xl bg-[#fee2e2] border-2 border-[#0a0a0a] text-rose-800 text-xs font-bold flex items-start gap-2 shadow-[2px_2px_0_#0a0a0a]">
+          <AppIcon name="alert-triangle" class="w-4 h-4 text-rose-600 shrink-0 mt-0.5" />
           <span>{{ errorMsg }}</span>
         </div>
 
         <button
           type="submit"
-          class="btn btn-primary w-full py-3 text-sm font-semibold"
+          class="nb-btn nb-btn-lg w-full bg-[var(--nb-lime,#e4ff3a)] text-[#0a0a0a] border-2 border-black font-extrabold text-base shadow-[4px_4px_0_#0a0a0a] active:translate-x-1 active:translate-y-1 active:shadow-none"
           :disabled="loading || !email.trim()"
         >
-          <svg v-if="loading" class="w-4 h-4 animate-spin text-white" fill="none" viewBox="0 0 24 24">
+          <svg v-if="loading" class="w-5 h-5 animate-spin text-black" fill="none" viewBox="0 0 24 24">
             <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
             <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
           </svg>
-          <span v-else class="flex items-center gap-2">
+          <span v-else class="flex items-center justify-center gap-2">
             <span>Kirim Token Pemulihan</span>
             <AppIcon name="arrow-right" class="w-4 h-4" />
           </span>
@@ -82,67 +82,67 @@
       <!-- Step 2: Reset Form -->
       <form v-else @submit.prevent="resetPassword" class="space-y-4">
         <!-- Demo Banner Token -->
-        <div class="p-3.5 rounded-xl bg-blue-500/10 border border-blue-500/20 text-xs text-blue-300 space-y-1">
+        <div class="p-3.5 rounded-2xl bg-[#dbeafe] border-2 border-[#0a0a0a] text-xs text-blue-950 space-y-1 shadow-[2px_2px_0_#0a0a0a]">
           <div class="flex items-center justify-between">
-            <span class="font-medium text-blue-200">Token Pemulihan (Mode Demo):</span>
-            <span class="font-mono font-bold text-white bg-blue-600/40 px-2 py-0.5 rounded">{{ resetToken }}</span>
+            <span class="font-bold text-blue-900">Token Pemulihan (Mode Demo):</span>
+            <span class="font-mono font-black text-black bg-white border border-[#0a0a0a] px-2 py-0.5 rounded-lg">{{ resetToken }}</span>
           </div>
-          <p class="text-[11px] text-slate-400">Token otomatis diisikan pada form di bawah.</p>
+          <p class="text-[11px] text-blue-800 font-medium">Token otomatis diisikan pada form di bawah.</p>
         </div>
 
         <div>
-          <label class="form-label">Token Reset</label>
+          <label class="form-label font-bold text-xs">Token Reset</label>
           <input
             v-model="token"
             type="text"
-            class="form-input font-mono"
+            class="form-input font-mono font-bold border-2 border-black rounded-xl shadow-[3px_3px_0_#0a0a0a]"
             placeholder="Kode token reset"
             required
           />
         </div>
 
         <div>
-          <label class="form-label">Password Baru</label>
+          <label class="form-label font-bold text-xs">Password Baru</label>
           <input
             v-model="newPassword"
             type="password"
-            class="form-input"
+            class="form-input border-2 border-black rounded-xl shadow-[3px_3px_0_#0a0a0a]"
             placeholder="Minimal 8 karakter"
             required
           />
         </div>
 
         <div>
-          <label class="form-label">Konfirmasi Password Baru</label>
+          <label class="form-label font-bold text-xs">Konfirmasi Password Baru</label>
           <input
             v-model="confirmPassword"
             type="password"
-            class="form-input"
+            class="form-input border-2 border-black rounded-xl shadow-[3px_3px_0_#0a0a0a]"
             placeholder="Ulangi password baru"
             required
           />
         </div>
 
-        <div v-if="errorMsg" class="p-3.5 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-300 text-sm flex items-start gap-2">
-          <AppIcon name="alert-triangle" class="w-4 h-4 text-rose-400 shrink-0 mt-0.5" />
+        <div v-if="errorMsg" class="p-3.5 rounded-xl bg-[#fee2e2] border-2 border-[#0a0a0a] text-rose-800 text-xs font-bold flex items-start gap-2 shadow-[2px_2px_0_#0a0a0a]">
+          <AppIcon name="alert-triangle" class="w-4 h-4 text-rose-600 shrink-0 mt-0.5" />
           <span>{{ errorMsg }}</span>
         </div>
 
-        <div v-if="successMsg" class="p-3.5 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 text-sm flex items-start gap-2">
-          <AppIcon name="check-circle" class="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
+        <div v-if="successMsg" class="p-3.5 rounded-xl bg-[#dcfce7] border-2 border-[#0a0a0a] text-emerald-900 text-xs font-bold flex items-start gap-2 shadow-[2px_2px_0_#0a0a0a]">
+          <AppIcon name="check-circle" class="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
           <span>{{ successMsg }}</span>
         </div>
 
         <button
           type="submit"
-          class="btn btn-success w-full py-3 text-sm font-semibold"
+          class="nb-btn nb-btn-lg w-full bg-[var(--nb-lime,#e4ff3a)] text-[#0a0a0a] border-2 border-black font-extrabold text-base shadow-[4px_4px_0_#0a0a0a] active:translate-x-1 active:translate-y-1 active:shadow-none"
           :disabled="loading"
         >
-          <svg v-if="loading" class="w-4 h-4 animate-spin text-white" fill="none" viewBox="0 0 24 24">
+          <svg v-if="loading" class="w-5 h-5 animate-spin text-black" fill="none" viewBox="0 0 24 24">
             <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
             <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
           </svg>
-          <span v-else class="flex items-center gap-2">
+          <span v-else class="flex items-center justify-center gap-2">
             <AppIcon name="check" class="w-4 h-4" />
             <span>Simpan Password Baru</span>
           </span>

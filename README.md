@@ -61,6 +61,14 @@ npm run dev
 
 ## 📋 Fitur Lengkap
 
+### Kiosk Gerbang Mandiri & Anti-Passback
+- ✅ Landing Page Kiosk Gerbang Masuk & Keluar (`/`)
+- ✅ Non-Member: Tombol ambil tiket masuk otomatis + auto-download karcis struk digital
+- ✅ Non-Member: Tiket sekali pakai (hanya bisa scan keluar 1x, dicegah scan keluar ganda)
+- ✅ Member: Scan QR / RFID / Input manual tanpa tiket berbayar (langsung buka gerbang)
+- ✅ Member: Perlindungan Anti-Passback (Masuk hanya jika `OUT`, Keluar hanya jika `IN`)
+- ✅ Simulator Palang Gerbang Interaktif (Barrier boom arm, signal lamp, sound synthesizer)
+
 ### Non-Member
 - ✅ Cetak tiket masuk (token 6 karakter)
 - ✅ Preview kalkulasi biaya (per jam, minimum 1 jam, ceil)
@@ -96,6 +104,11 @@ npm run dev
 Base URL: `http://localhost:8000/api`
 
 ```
+POST   /gate/tickets/dispense    Kiosk: Ambil tiket masuk non-member (buka gerbang)
+POST   /gate/members/scan        Kiosk: Scan member in/out (Anti-Passback)
+POST   /gate/tickets/scan-exit   Kiosk: Validasi tiket keluar non-member (1x pakai)
+POST   /gate/tickets/pay-exit    Kiosk: Bayar & selesaikan tiket keluar
+
 POST   /login                    Auth: login
 POST   /logout                   Auth: logout
 GET    /me                       Auth: profil user

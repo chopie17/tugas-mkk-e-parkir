@@ -35,6 +35,9 @@ class Member extends Model
         'vehicle_category',
         'monthly_fee',
         'is_active',
+        'parking_status',
+        'last_entry_at',
+        'last_exit_at',
         'created_by',
     ];
 
@@ -44,6 +47,8 @@ class Member extends Model
             'vehicle_category' => VehicleCategory::class,
             'monthly_fee'      => 'integer',
             'is_active'        => 'boolean',
+            'last_entry_at'    => 'datetime',
+            'last_exit_at'     => 'datetime',
         ];
     }
 

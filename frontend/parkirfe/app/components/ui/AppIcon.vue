@@ -41,6 +41,12 @@
       <path d="M12 21v-1" />
     </template>
 
+    <!-- Camera -->
+    <template v-else-if="name === 'camera'">
+      <path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z" />
+      <circle cx="12" cy="13" r="3" />
+    </template>
+
     <!-- Users / Members -->
     <template v-else-if="name === 'users'">
       <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />

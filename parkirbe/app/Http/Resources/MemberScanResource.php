@@ -13,9 +13,10 @@ class MemberScanResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
-            'allowed' => $this->resource['allowed'],
-            'reason'  => $this->resource['reason'],
-            'member'  => $this->resource['member']
+            'allowed'   => $this->resource['allowed'],
+            'reason'    => $this->resource['reason'],
+            'direction' => $this->resource['direction'] ?? 'in',
+            'member'    => $this->resource['member']
                 ? new MemberResource($this->resource['member'])
                 : null,
         ];

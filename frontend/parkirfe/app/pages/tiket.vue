@@ -3,298 +3,257 @@
     <!-- Header -->
     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
       <div>
-        <h1 class="text-2xl font-bold tracking-tight text-white">Kasir Parkir Non-Member</h1>
-        <p class="text-xs text-slate-400 mt-1">Pencetakan tiket masuk portal dan penyelesaian kasir pembayaran keluar</p>
+        <h1 class="text-2xl font-black tracking-tight text-[#0a0a0a]">Terminal Kasir & Gate</h1>
+        <p class="text-xs text-[var(--nb-muted)] mt-1 font-medium">Kasir tiket non-member dan verifikasi gate scan member dalam satu terminal</p>
       </div>
-      <button
-        class="btn btn-primary shadow-lg shadow-blue-600/20"
-        @click="issueTicket"
-        :disabled="issuingTicket"
-      >
-        <svg v-if="issuingTicket" class="w-4 h-4 animate-spin text-white" fill="none" viewBox="0 0 24 24">
-          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
-          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
-        </svg>
-        <span v-else class="flex items-center gap-2">
-          <AppIcon name="printer" class="w-4 h-4" />
-          <span>Cetak Tiket Masuk Baru</span>
-        </span>
-      </button>
+      <div class="flex items-center gap-2">
+        <button
+          class="nb-btn bg-[var(--nb-lime)] text-[#0a0a0a] font-bold border-2 border-black shadow-[3px_3px_0_#0a0a0a] hover:bg-[#d4f028]"
+          @click="issueTicket"
+          :disabled="issuingTicket"
+        >
+          <svg v-if="issuingTicket" class="w-4 h-4 animate-spin text-black" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
+          </svg>
+          <span v-else class="flex items-center gap-2">
+            <AppIcon name="printer" class="w-4 h-4" />
+            <span>Cetak Tiket Masuk Baru</span>
+          </span>
+        </button>
+      </div>
     </div>
 
-    <div class="grid grid-cols-1 xl:grid-cols-12 gap-6">
-      <!-- Left 7 cols: Issuance Voucher + Cashier Terminal -->
-      <div class="xl:col-span-7 space-y-6">
-        <!-- 1. Newly Issued Ticket Mockup Card -->
-        <div v-if="newTicket" class="glass-card p-6 border-emerald-500/30 bg-gradient-to-b from-slate-900/95 to-[#0b1220]/95 relative overflow-hidden">
-          <div class="flex items-center justify-between pb-3 border-b border-slate-800/80 mb-4">
+    <!-- ─── 2 OPERATION CARDS (side by side) ──────────────────────────────── -->
+    <div class="grid grid-cols-1 xl:grid-cols-2 gap-6">
+
+      <!-- LEFT: Kasir Non-Member -->
+      <div class="space-y-4">
+        <!-- Newly Issued Ticket Preview -->
+        <div v-if="newTicket" class="nb-card bg-[var(--nb-teal)]/20 p-5 border-2 border-black shadow-[4px_4px_0_#0a0a0a]">
+          <div class="flex items-center justify-between pb-3 border-b-2 border-black mb-4">
             <div class="flex items-center gap-2">
-              <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
-              <span class="text-xs font-semibold uppercase tracking-wider text-emerald-400">Tiket Masuk Siap Cetak</span>
+              <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 border border-black animate-pulse"></span>
+              <span class="text-xs font-bold uppercase tracking-wider text-black">Tiket Masuk Siap Cetak</span>
             </div>
-            <button class="p-1 text-slate-400 hover:text-white rounded-lg transition-colors" @click="newTicket = null">
+            <button class="p-1 text-black hover:bg-black/10 rounded-md" @click="newTicket = null">
               <AppIcon name="close" class="w-4 h-4" />
             </button>
           </div>
-
-          <!-- Thermal Receipt Mockup -->
-          <div class="bg-white text-slate-900 p-5 rounded-xl shadow-xl max-w-sm mx-auto font-mono text-xs">
-            <div class="text-center pb-3 border-b border-dashed border-slate-300">
-              <p class="font-bold text-sm tracking-tight text-slate-950 font-sans">E-PARKIR PLAZA ANDALAS</p>
-              <p class="text-[10px] text-slate-500 font-sans mt-0.5">Sistem Manajemen Parkir Resmi</p>
-              <p class="text-[10px] text-slate-400 font-sans">Jl. Pemuda No. 1, Kota Padang</p>
+          <div class="bg-white text-black p-4 rounded-xl border-2 border-black shadow-[3px_3px_0_#0a0a0a] max-w-xs mx-auto font-mono text-xs">
+            <div class="text-center pb-3 border-b border-dashed border-black/40">
+              <p class="font-black text-sm tracking-tight text-black font-sans">E-PARKIR PLAZA ANDALAS</p>
+              <p class="text-[10px] text-black/60 font-sans">Sistem Manajemen Parkir Resmi</p>
             </div>
-
-            <div class="py-4 text-center">
-              <p class="text-[10px] text-slate-500 uppercase tracking-widest">KODE TIKET MASUK</p>
-              <p class="text-3xl font-extrabold tracking-[0.25em] text-slate-950 my-1 font-mono">
-                {{ newTicket.token }}
-              </p>
-              <div class="h-8 my-2 flex items-center justify-center gap-1 opacity-75">
-                <span v-for="i in 28" :key="i" class="h-full bg-slate-900 inline-block" :style="{ width: (i % 3 === 0 ? '3px' : '1.5px') }"></span>
+            <div class="py-3 text-center">
+              <p class="text-[10px] text-black/60 uppercase tracking-widest font-sans font-bold">KODE TIKET MASUK</p>
+              <p class="text-2xl font-extrabold tracking-[0.2em] text-black my-1 font-mono">{{ newTicket.token }}</p>
+              <div class="h-7 my-1.5 flex items-center justify-center gap-0.5 opacity-80">
+                <span v-for="i in 28" :key="i" class="h-full bg-black inline-block" :style="{ width: (i % 3 === 0 ? '3px' : '1.5px') }"></span>
               </div>
             </div>
-
-            <div class="pt-3 border-t border-dashed border-slate-300 space-y-1 text-[11px] text-slate-600">
+            <div class="pt-2 border-t border-dashed border-black/40 space-y-1 text-[11px] text-black">
               <div class="flex justify-between">
-                <span>Waktu Masuk:</span>
-                <span class="font-bold text-slate-800">{{ formatDateTime(newTicket.entry_at) }}</span>
+                <span class="text-black/60">Waktu Masuk:</span>
+                <span class="font-bold">{{ formatDateTime(newTicket.entry_at) }}</span>
               </div>
               <div class="flex justify-between">
-                <span>Pintu Masuk:</span>
-                <span class="font-bold text-slate-800">Gate Masuk 01</span>
+                <span class="text-black/60">Status:</span>
+                <span class="font-bold text-emerald-700">AKTIF</span>
               </div>
-              <div class="flex justify-between">
-                <span>Status:</span>
-                <span class="font-bold text-emerald-700">AKTIF / TERDAFTAR</span>
-              </div>
-            </div>
-
-            <div class="mt-4 pt-3 border-t border-slate-200 text-center text-[9px] text-slate-400 font-sans">
-              * Harap simpan tiket ini. Kehilangan tiket dikenakan denda sesuai peraturan Plaza Andalas.
             </div>
           </div>
-
-          <div class="mt-5 flex gap-3 max-w-sm mx-auto">
-            <button
-              class="btn btn-outline flex-1 text-xs"
-              @click="printTicketMockup"
-            >
+          <div class="mt-4 flex gap-2 max-w-xs mx-auto">
+            <button class="nb-btn bg-white text-black flex-1 text-xs font-bold border-2 border-black shadow-[2px_2px_0_#0a0a0a]" @click="printTicketMockup">
               <AppIcon name="printer" class="w-3.5 h-3.5" />
-              <span>Simulasi Cetak</span>
+              <span>Cetak</span>
             </button>
-            <button
-              class="btn btn-primary flex-1 text-xs"
-              @click="loadToPayment(newTicket)"
-            >
+            <button class="nb-btn bg-[var(--nb-lime)] text-black flex-1 text-xs font-bold border-2 border-black shadow-[2px_2px_0_#0a0a0a]" @click="loadToPayment(newTicket)">
               <AppIcon name="credit-card" class="w-3.5 h-3.5" />
-              <span>Buka Pembayaran</span>
+              <span>Buka Kasir</span>
             </button>
           </div>
         </div>
 
-        <!-- 2. Search & Cashier Payment Form -->
-        <div class="glass-card p-6 space-y-6">
-          <div>
-            <div class="flex items-center gap-2 mb-2">
-              <AppIcon name="search" class="w-4 h-4 text-blue-400" />
-              <h2 class="text-sm font-semibold uppercase tracking-wider text-slate-300">Cari Tiket Keluar</h2>
+        <!-- Cashier / Search Card -->
+        <div class="nb-card bg-white border-2 border-black p-5 shadow-[4px_4px_0_#0a0a0a] space-y-5">
+          <div class="flex items-center gap-2 pb-3 border-b-2 border-black/10">
+            <div class="w-8 h-8 rounded-lg bg-[var(--nb-lime)] border-2 border-black flex items-center justify-center">
+              <AppIcon name="search" class="w-4 h-4 text-black" />
             </div>
-            <p class="text-xs text-slate-400 mb-3">Ketik kode token tiket fisik pengemudi untuk menghitung durasi dan biaya parkir</p>
-
-            <div class="flex gap-2">
-              <div class="relative flex-1">
-                <input
-                  v-model="searchToken"
-                  type="text"
-                  class="form-input text-base font-mono font-bold tracking-widest uppercase pl-4"
-                  placeholder="Misal: A1B2C3"
-                  @keydown.enter="findTicket"
-                  @input="searchToken = searchToken.toUpperCase()"
-                />
-              </div>
-              <button
-                class="btn btn-primary px-6 shrink-0"
-                @click="findTicket"
-                :disabled="finding || !searchToken.trim()"
-              >
-                <svg v-if="finding" class="w-4 h-4 animate-spin text-white" fill="none" viewBox="0 0 24 24">
-                  <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
-                  <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
-                </svg>
-                <span v-else class="flex items-center gap-1.5">
-                  <AppIcon name="search" class="w-4 h-4" />
-                  <span>Cari Tiket</span>
-                </span>
-              </button>
+            <div>
+              <h2 class="text-sm font-black text-black">Kasir Keluar Non-Member</h2>
+              <p class="text-[11px] text-[var(--nb-muted)]">Cari tiket token untuk hitung biaya & bayar</p>
             </div>
-            <p v-if="findError" class="text-xs mt-2 text-rose-400 flex items-center gap-1">
-              <AppIcon name="alert-triangle" class="w-3.5 h-3.5" />
-              <span>{{ findError }}</span>
-            </p>
           </div>
 
-          <!-- Found Ticket Details & Payment Calculator -->
-          <div v-if="foundTicket" class="pt-5 border-t border-slate-800/80 space-y-5 animate-fade-in">
-            <!-- Ticket Info Header -->
-            <div class="flex items-center justify-between p-4 rounded-xl bg-slate-900/90 border border-slate-800/80">
+          <div class="flex gap-2">
+            <input
+              v-model="searchToken"
+              type="text"
+              class="form-input flex-1 text-base font-mono font-bold tracking-widest uppercase border-2 border-black rounded-xl shadow-[2px_2px_0_#0a0a0a]"
+              placeholder="Misal: A1B2C3"
+              @keydown.enter="findTicket"
+              @input="searchToken = searchToken.toUpperCase()"
+            />
+            <button
+              class="nb-btn bg-[var(--nb-purple)] text-white font-bold px-5 shrink-0 border-2 border-black shadow-[3px_3px_0_#0a0a0a] hover:opacity-90"
+              @click="findTicket"
+              :disabled="finding || !searchToken.trim()"
+            >
+              <svg v-if="finding" class="w-4 h-4 animate-spin text-white" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
+              </svg>
+              <span v-else class="flex items-center gap-1.5">
+                <AppIcon name="search" class="w-4 h-4" />
+                <span>Cari</span>
+              </span>
+            </button>
+          </div>
+          <p v-if="findError" class="text-xs text-rose-600 font-semibold flex items-center gap-1 -mt-3">
+            <AppIcon name="alert-triangle" class="w-3.5 h-3.5" />
+            <span>{{ findError }}</span>
+          </p>
+
+          <!-- Found Ticket -->
+          <div v-if="foundTicket" class="pt-4 border-t-2 border-black/10 space-y-4 animate-fade-in">
+            <div class="flex items-center justify-between p-3.5 rounded-xl bg-[var(--nb-bg)] border-2 border-black shadow-[2px_2px_0_#0a0a0a]">
               <div class="flex items-center gap-3">
-                <div class="w-10 h-10 rounded-lg bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-blue-400">
-                  <AppIcon name="ticket" class="w-5 h-5" />
+                <div class="w-9 h-9 rounded-lg bg-[var(--nb-teal)] border-2 border-black flex items-center justify-center text-black">
+                  <AppIcon name="ticket" class="w-4 h-4" />
                 </div>
                 <div>
-                  <p class="text-xs text-slate-400">Kode Token Tiket</p>
-                  <p class="text-lg font-mono font-bold text-white tracking-widest">{{ foundTicket.token }}</p>
+                  <p class="text-[10px] text-[var(--nb-muted)] font-medium">Kode Token</p>
+                  <p class="text-base font-mono font-black text-black tracking-widest">{{ foundTicket.token }}</p>
                 </div>
               </div>
-              <div class="text-right">
-                <span
-                  class="text-xs px-3 py-1 rounded-full font-medium"
-                  :class="foundTicket.status === 'active' ? 'badge-active' : 'badge-paid'"
-                >
-                  {{ foundTicket.status === 'active' ? 'Tiket Belum Dibayar' : 'Sudah Lunas' }}
-                </span>
-                <p class="text-[11px] text-slate-400 mt-1 font-mono">Masuk: {{ formatDateTime(foundTicket.entry_at) }}</p>
-              </div>
+              <span
+                class="text-xs px-2.5 py-1 rounded-full font-bold border-2 border-black"
+                :class="foundTicket.status === 'active' ? 'bg-[var(--nb-orange)]/40 text-black' : 'bg-[var(--nb-lime)] text-black'"
+              >
+                {{ foundTicket.status === 'active' ? 'Belum Bayar' : 'Lunas' }}
+              </span>
             </div>
 
-            <!-- Active Ticket Form -->
+            <!-- Active Ticket Payment Form -->
             <div v-if="foundTicket.status === 'active'" class="space-y-4">
-              <!-- Vehicle & Plate Selector -->
-              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div class="grid grid-cols-2 gap-3">
                 <div>
-                  <label class="form-label">Kategori Kendaraan</label>
+                  <label class="form-label text-black font-bold">Kategori Kendaraan</label>
                   <div class="grid grid-cols-2 gap-2">
                     <button
                       type="button"
-                      class="flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl border text-xs font-semibold transition-all"
-                      :class="payForm.vehicle_category === 'motor'
-                        ? 'bg-blue-600/20 border-blue-500 text-blue-300 shadow-sm shadow-blue-500/15'
-                        : 'bg-slate-900/60 border-slate-800 text-slate-400 hover:text-slate-200'"
+                      class="flex items-center justify-center gap-1.5 py-2 px-2 rounded-xl border-2 border-black text-xs font-bold transition-all"
+                      :class="payForm.vehicle_category === 'motor' ? 'bg-[var(--nb-lime)] text-black shadow-[2px_2px_0_#0a0a0a]' : 'bg-white text-black hover:bg-gray-100 shadow-[1px_1px_0_#0a0a0a]'"
                       @click="payForm.vehicle_category = 'motor'; refreshPreview()"
                     >
-                      <AppIcon name="motorcycle" class="w-4 h-4" />
+                      <AppIcon name="motorcycle" class="w-3.5 h-3.5" />
                       <span>Motor</span>
                     </button>
                     <button
                       type="button"
-                      class="flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl border text-xs font-semibold transition-all"
-                      :class="payForm.vehicle_category === 'mobil'
-                        ? 'bg-blue-600/20 border-blue-500 text-blue-300 shadow-sm shadow-blue-500/15'
-                        : 'bg-slate-900/60 border-slate-800 text-slate-400 hover:text-slate-200'"
+                      class="flex items-center justify-center gap-1.5 py-2 px-2 rounded-xl border-2 border-black text-xs font-bold transition-all"
+                      :class="payForm.vehicle_category === 'mobil' ? 'bg-[var(--nb-lime)] text-black shadow-[2px_2px_0_#0a0a0a]' : 'bg-white text-black hover:bg-gray-100 shadow-[1px_1px_0_#0a0a0a]'"
                       @click="payForm.vehicle_category = 'mobil'; refreshPreview()"
                     >
-                      <AppIcon name="car" class="w-4 h-4" />
+                      <AppIcon name="car" class="w-3.5 h-3.5" />
                       <span>Mobil</span>
                     </button>
                   </div>
                 </div>
-
                 <div>
-                  <label class="form-label">Plat Nomor Kendaraan</label>
+                  <label class="form-label text-black font-bold">Plat Nomor</label>
                   <input
                     v-model="payForm.plate_number"
                     type="text"
-                    class="form-input font-mono font-bold uppercase tracking-wider"
+                    class="form-input font-mono font-bold uppercase tracking-wider border-2 border-black rounded-xl shadow-[2px_2px_0_#0a0a0a]"
                     placeholder="BA 1234 XY"
                     @input="payForm.plate_number = payForm.plate_number.toUpperCase()"
                   />
                 </div>
               </div>
 
-              <!-- Cost Calculation Summary Box -->
-              <div v-if="preview" class="p-4 rounded-xl bg-slate-950/80 border border-blue-500/30 space-y-2">
-                <div class="flex justify-between text-xs text-slate-400">
-                  <span>Durasi Terhitung (Ceil per jam)</span>
-                  <span class="font-mono text-slate-200 font-semibold">{{ preview.hours }} Jam</span>
+              <div v-if="preview" class="p-3.5 rounded-xl bg-[var(--nb-yellow)]/30 border-2 border-black shadow-[2px_2px_0_#0a0a0a] space-y-1.5">
+                <div class="flex justify-between text-xs text-black/70">
+                  <span class="font-medium">Durasi (Ceil/jam)</span>
+                  <span class="font-mono text-black font-bold">{{ preview.hours }} Jam</span>
                 </div>
-                <div class="flex justify-between text-xs text-slate-400">
-                  <span>Tarif / Jam</span>
-                  <span class="font-mono text-slate-200">{{ formatRupiah(preview.tariff_per_hour) }}</span>
+                <div class="flex justify-between text-xs text-black/70">
+                  <span class="font-medium">Tarif / Jam</span>
+                  <span class="font-mono text-black font-bold">{{ formatRupiah(preview.tariff_per_hour) }}</span>
                 </div>
-                <div class="pt-2 border-t border-slate-800 flex justify-between items-center text-sm">
-                  <span class="font-semibold text-blue-300">Total Tarif Parkir</span>
-                  <span class="text-xl font-bold font-mono text-emerald-400">{{ formatRupiah(preview.fee) }}</span>
+                <div class="pt-2 border-t-2 border-black/10 flex justify-between items-center">
+                  <span class="font-bold text-sm text-black">Total Tarif</span>
+                  <span class="text-xl font-black font-mono text-black">{{ formatRupiah(preview.fee) }}</span>
                 </div>
               </div>
 
-              <!-- Cash Input & Change Calculator -->
-              <div class="space-y-2">
-                <label class="form-label">Uang Tunai Diterima (Rp)</label>
+              <div>
+                <label class="form-label text-black font-bold">Uang Tunai Diterima (Rp)</label>
                 <div class="relative">
-                  <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-500 font-mono text-xs">
-                    Rp
-                  </div>
+                  <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-black font-mono text-xs font-black select-none">Rp</div>
                   <input
                     v-model.number="payForm.cash_received"
                     type="number"
-                    class="form-input pl-10 font-mono font-bold text-base"
+                    class="form-input pl-11 font-mono font-bold text-base border-2 border-black rounded-xl shadow-[2px_2px_0_#0a0a0a]"
                     placeholder="0"
                     min="0"
                   />
                 </div>
-
-                <!-- Change Calculation Banner -->
                 <div
                   v-if="payForm.cash_received && preview"
-                  class="p-3 rounded-lg text-xs font-mono flex items-center justify-between"
-                  :class="payForm.cash_received >= preview.fee
-                    ? 'bg-emerald-500/10 text-emerald-300 border border-emerald-500/20'
-                    : 'bg-rose-500/10 text-rose-300 border border-rose-500/20'"
+                  class="mt-2 p-2.5 rounded-xl text-xs font-mono flex items-center justify-between border-2 border-black shadow-[1.5px_1.5px_0_#0a0a0a]"
+                  :class="payForm.cash_received >= preview.fee ? 'bg-[var(--nb-teal)]/30 text-black' : 'bg-rose-100 text-rose-900'"
                 >
-                  <span>{{ payForm.cash_received >= preview.fee ? 'Kembalian Pelanggan:' : 'Uang Tunai Kurang:' }}</span>
-                  <span class="font-bold text-sm">
-                    {{ formatRupiah(Math.abs(payForm.cash_received - (preview?.fee || 0))) }}
-                  </span>
+                  <span class="font-bold">{{ payForm.cash_received >= preview.fee ? 'Kembalian:' : 'Kurang:' }}</span>
+                  <span class="font-black text-sm">{{ formatRupiah(Math.abs(payForm.cash_received - (preview?.fee || 0))) }}</span>
                 </div>
               </div>
 
-              <!-- Error alert -->
-              <div v-if="payError" class="p-3 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-300 text-xs flex items-center gap-2">
+              <div v-if="payError" class="p-3 rounded-xl bg-rose-100 border-2 border-black text-rose-900 text-xs flex items-center gap-2 font-bold shadow-[2px_2px_0_#0a0a0a]">
                 <AppIcon name="alert-triangle" class="w-4 h-4 shrink-0" />
                 <span>{{ payError }}</span>
               </div>
 
-              <!-- Submit Payment Button -->
               <button
-                class="btn btn-success w-full py-3.5 text-sm font-semibold tracking-wide"
+                class="nb-btn bg-[var(--nb-lime)] text-black w-full py-3 text-sm font-black tracking-wide border-2 border-black shadow-[4px_4px_0_#0a0a0a] hover:bg-[#d4f028]"
                 :disabled="paying || !payForm.vehicle_category || !payForm.plate_number || (preview && payForm.cash_received < preview.fee)"
                 @click="processPayment"
               >
-                <svg v-if="paying" class="w-4 h-4 animate-spin text-white" fill="none" viewBox="0 0 24 24">
+                <svg v-if="paying" class="w-4 h-4 animate-spin text-black" fill="none" viewBox="0 0 24 24">
                   <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
                   <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
                 </svg>
-                <span v-else class="flex items-center gap-2">
+                <span v-else class="flex items-center justify-center gap-2">
                   <AppIcon name="check" class="w-4 h-4" />
-                  <span>Selesaikan Pembayaran & Buka Portal Keluar</span>
+                  <span>Selesaikan Pembayaran & Buka Portal</span>
                 </span>
               </button>
             </div>
 
-            <!-- Paid Ticket Receipt Box -->
-            <div v-else class="p-5 rounded-xl bg-slate-950/80 border border-emerald-500/30 space-y-3">
-              <div class="flex items-center gap-2 text-emerald-400 font-semibold text-sm">
-                <AppIcon name="check-circle" class="w-5 h-5" />
+            <!-- Paid Receipt -->
+            <div v-else class="p-4 rounded-xl bg-[var(--nb-teal)]/20 border-2 border-black shadow-[2px_2px_0_#0a0a0a] space-y-3">
+              <div class="flex items-center gap-2 text-black font-black text-sm">
+                <AppIcon name="check-circle" class="w-5 h-5 text-emerald-600" />
                 <span>Pembayaran Sukses — Portal Keluar Dibuka</span>
               </div>
-
-              <div class="grid grid-cols-2 gap-3 text-xs pt-2 border-t border-slate-800 font-mono">
+              <div class="grid grid-cols-2 gap-2.5 text-xs pt-2 border-t-2 border-black/10 font-mono">
                 <div>
-                  <span class="text-slate-500 block text-[10px]">NOMOR INVOICE</span>
-                  <span class="text-white font-bold">{{ foundTicket.invoice_number }}</span>
+                  <span class="text-black/60 block text-[10px] font-sans font-bold">INVOICE</span>
+                  <span class="text-black font-black">{{ foundTicket.invoice_number }}</span>
                 </div>
                 <div>
-                  <span class="text-slate-500 block text-[10px]">TOTAL TARIF</span>
-                  <span class="text-emerald-400 font-bold">{{ formatRupiah(foundTicket.fee) }}</span>
+                  <span class="text-black/60 block text-[10px] font-sans font-bold">TOTAL TARIF</span>
+                  <span class="text-black font-black">{{ formatRupiah(foundTicket.fee) }}</span>
                 </div>
                 <div>
-                  <span class="text-slate-500 block text-[10px]">TUNAI DITERIMA</span>
-                  <span class="text-slate-200">{{ formatRupiah(foundTicket.cash_received) }}</span>
+                  <span class="text-black/60 block text-[10px] font-sans font-bold">TUNAI DITERIMA</span>
+                  <span class="text-black font-semibold">{{ formatRupiah(foundTicket.cash_received) }}</span>
                 </div>
                 <div>
-                  <span class="text-slate-500 block text-[10px]">KEMBALIAN</span>
-                  <span class="text-slate-200">{{ formatRupiah(foundTicket.change_amount) }}</span>
+                  <span class="text-black/60 block text-[10px] font-sans font-bold">KEMBALIAN</span>
+                  <span class="text-black font-semibold">{{ formatRupiah(foundTicket.change_amount) }}</span>
                 </div>
               </div>
             </div>
@@ -302,61 +261,207 @@
         </div>
       </div>
 
-      <!-- Right 5 cols: Live Active Tickets Table -->
-      <div class="xl:col-span-5">
-        <div class="glass-card overflow-hidden">
-          <div class="px-5 py-4 border-b border-slate-800/80 flex items-center justify-between">
+      <!-- RIGHT: Gate Scan Member -->
+      <div class="space-y-4">
+        <div class="nb-card bg-white border-2 border-black p-5 shadow-[4px_4px_0_#0a0a0a] space-y-5">
+          <div class="flex items-center justify-between pb-3 border-b-2 border-black/10">
             <div class="flex items-center gap-2">
-              <AppIcon name="ticket" class="w-4 h-4 text-slate-400" />
-              <h2 class="text-sm font-semibold text-white">Daftar Tiket Hari Ini</h2>
+              <div class="w-8 h-8 rounded-lg bg-[var(--nb-purple)] border-2 border-black flex items-center justify-center">
+                <AppIcon name="scan" class="w-4 h-4 text-white" />
+              </div>
+              <div>
+                <h2 class="text-sm font-black text-black">Gate Scan Member</h2>
+                <p class="text-[11px] text-[var(--nb-muted)]">Verifikasi QR / barcode kartu member</p>
+              </div>
             </div>
-            <span class="text-xs px-2 py-0.5 rounded-full bg-slate-800 text-slate-400 font-mono">
-              {{ tickets.length }} tiket
-            </span>
+            <div class="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[var(--nb-lime)] border-2 border-black shadow-[1.5px_1.5px_0_#0a0a0a] text-[11px] text-black font-mono font-black">
+              <span class="w-2 h-2 rounded-full bg-emerald-600 animate-ping"></span>
+              <span>GATE 01</span>
+            </div>
           </div>
 
-          <div class="overflow-y-auto max-h-[620px]">
-            <table class="data-table">
-              <thead>
-                <tr>
-                  <th>Token</th>
-                  <th>Waktu Masuk</th>
-                  <th>Status</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr v-if="!tickets.length">
-                  <td colspan="3" class="text-center py-12 text-slate-500 text-xs">
-                    Belum ada riwayat tiket hari ini
-                  </td>
-                </tr>
+          <!-- Scanner Visual Frame -->
+          <div class="h-24 flex flex-col items-center justify-center border-2 border-dashed border-black rounded-2xl bg-[var(--nb-bg)] text-center gap-1.5">
+            <div class="w-9 h-9 rounded-xl bg-[var(--nb-lime)] border-2 border-black flex items-center justify-center text-black shadow-[2px_2px_0_#0a0a0a]">
+              <AppIcon name="scan" class="w-5 h-5" />
+            </div>
+            <p class="text-xs font-black text-[#0a0a0a]">Arahkan scanner ke kartu QR / Barcode Member</p>
+          </div>
 
-                <tr
-                  v-for="t in tickets"
-                  :key="t.id"
-                  class="cursor-pointer transition-colors"
-                  :class="foundTicket?.token === t.token ? 'bg-blue-500/10' : ''"
-                  @click="selectTicket(t)"
-                >
-                  <td>
-                    <span class="font-mono text-xs font-bold text-white px-2 py-1 rounded bg-slate-800/70 border border-slate-700/60">
-                      {{ t.token }}
+          <!-- Scan Input -->
+          <div class="flex gap-2">
+            <input
+              ref="scanInputRef"
+              v-model="scanCode"
+              type="text"
+              class="form-input flex-1 text-center font-mono text-base font-black tracking-widest uppercase border-2 border-black rounded-xl shadow-[2px_2px_0_#0a0a0a]"
+              placeholder="MBR-DEMO0001"
+              @keydown.enter="doScan"
+              @input="scanCode = scanCode.toUpperCase()"
+            />
+            <button
+              class="nb-btn bg-[var(--nb-purple)] text-white px-5 shrink-0 font-bold border-2 border-black shadow-[3px_3px_0_#0a0a0a] hover:opacity-90"
+              @click="doScan"
+              :disabled="scanning || !scanCode.trim()"
+            >
+              <svg v-if="scanning" class="w-4 h-4 animate-spin text-white" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
+              </svg>
+              <span v-else class="flex items-center gap-1.5">
+                <AppIcon name="search" class="w-4 h-4" />
+                <span>Verifikasi</span>
+              </span>
+            </button>
+          </div>
+
+          <!-- Scan Result -->
+          <transition name="page">
+            <div
+              v-if="scanResult"
+              class="p-5 rounded-2xl border-2 border-black shadow-[3px_3px_0_#0a0a0a]"
+              :class="scanResult.allowed ? 'bg-[#dcfce7] text-[#14532d]' : 'bg-[#fee2e2] text-rose-900'"
+            >
+              <div class="flex items-center justify-between gap-3">
+                <div class="flex items-center gap-3">
+                  <div
+                    class="w-11 h-11 rounded-2xl flex items-center justify-center shrink-0 border-2 border-black shadow-[2px_2px_0_#0a0a0a]"
+                    :class="scanResult.allowed ? 'bg-white text-emerald-600' : 'bg-white text-rose-600'"
+                  >
+                    <AppIcon :name="scanResult.allowed ? 'gate' : 'x-circle'" class="w-6 h-6" />
+                  </div>
+                  <div>
+                    <span class="inline-block text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full mb-1 border border-black bg-white shadow-[1px_1px_0_#0a0a0a]">
+                      {{ scanResult.allowed ? 'PORTAL DIBUKA · SILAKAN MASUK' : 'AKSES DITOLAK' }}
                     </span>
-                  </td>
-                  <td class="text-xs font-mono text-slate-400">
-                    {{ formatDateTime(t.entry_at) }}
-                  </td>
-                  <td>
-                    <span
-                      class="text-xs px-2 py-0.5 rounded-full font-medium"
-                      :class="t.status === 'active' ? 'badge-active' : 'badge-paid'"
-                    >
-                      {{ t.status === 'active' ? 'Aktif' : 'Lunas' }}
-                    </span>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
+                    <h3 class="text-sm font-black text-[#0a0a0a]">{{ scanResult.reason }}</h3>
+                  </div>
+                </div>
+                <button class="nb-btn nb-btn-sm bg-white shrink-0" @click="resetScan">
+                  <AppIcon name="refresh" class="w-3.5 h-3.5" />
+                  <span>Reset</span>
+                </button>
+              </div>
+
+              <!-- Member Detail -->
+              <div v-if="scanResult.member" class="mt-4 pt-3 border-t-2 border-black/10 grid grid-cols-2 gap-2 text-xs">
+                <div class="p-2.5 rounded-xl bg-white border-2 border-black shadow-[1px_1px_0_#0a0a0a]">
+                  <span class="text-[10px] text-slate-500 font-bold block uppercase">Nama Member</span>
+                  <span class="font-extrabold text-[#0a0a0a] truncate block mt-0.5">{{ scanResult.member.name }}</span>
+                </div>
+                <div class="p-2.5 rounded-xl bg-white border-2 border-black shadow-[1px_1px_0_#0a0a0a]">
+                  <span class="text-[10px] text-slate-500 font-bold block uppercase">Plat Nomor</span>
+                  <span class="font-mono font-black text-[#0a0a0a] block mt-0.5">{{ scanResult.member.plate_number }}</span>
+                </div>
+                <div class="p-2.5 rounded-xl bg-white border-2 border-black shadow-[1px_1px_0_#0a0a0a]">
+                  <span class="text-[10px] text-slate-500 font-bold block uppercase">Kendaraan</span>
+                  <span class="font-black text-blue-700 block mt-0.5 uppercase">{{ scanResult.member.vehicle_category }}</span>
+                </div>
+                <div class="p-2.5 rounded-xl bg-white border-2 border-black shadow-[1px_1px_0_#0a0a0a]">
+                  <span class="text-[10px] text-slate-500 font-bold block uppercase">Status</span>
+                  <span class="font-black text-emerald-700 block mt-0.5">Aktif Berlangganan</span>
+                </div>
+              </div>
+            </div>
+          </transition>
+        </div>
+      </div>
+    </div>
+
+    <!-- ─── 2 LOG TABLES (side by side) ──────────────────────────────────── -->
+    <div class="grid grid-cols-1 xl:grid-cols-2 gap-6">
+
+      <!-- Left: Log Tiket Non-Member Hari Ini -->
+      <div class="nb-card bg-white border-2 border-black shadow-[4px_4px_0_#0a0a0a] overflow-hidden">
+        <div class="px-5 py-4 border-b-2 border-black bg-[var(--nb-yellow)]/20 flex items-center justify-between">
+          <div class="flex items-center gap-2">
+            <AppIcon name="ticket" class="w-4 h-4 text-black" />
+            <h2 class="text-sm font-black text-black">Log Tiket Non-Member Hari Ini</h2>
+          </div>
+          <span class="text-xs px-2.5 py-0.5 rounded-full bg-white border-2 border-black font-mono font-bold text-black shadow-[1px_1px_0_#0a0a0a]">
+            {{ tickets.length }} tiket
+          </span>
+        </div>
+        <div class="overflow-y-auto max-h-72">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Token</th>
+                <th>Waktu Masuk</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-if="!tickets.length">
+                <td colspan="3" class="text-center py-10 text-[var(--nb-muted)] text-xs font-medium">
+                  Belum ada tiket hari ini
+                </td>
+              </tr>
+              <tr
+                v-for="t in tickets"
+                :key="t.id"
+                class="cursor-pointer transition-colors hover:bg-black/5"
+                :class="foundTicket?.token === t.token ? 'bg-[var(--nb-lime)]/25' : ''"
+                @click="selectTicket(t)"
+              >
+                <td>
+                  <span class="font-mono text-xs font-black text-black px-1.5 py-1 rounded bg-white border-2 border-black shadow-[1.5px_1.5px_0_#0a0a0a]">
+                    {{ t.token }}
+                  </span>
+                </td>
+                <td class="text-xs font-mono text-[var(--nb-ink)] font-medium">{{ formatDateTime(t.entry_at) }}</td>
+                <td>
+                  <span
+                    class="text-xs px-2 py-0.5 rounded-full font-bold border-2 border-black shadow-[1px_1px_0_#0a0a0a]"
+                    :class="t.status === 'active' ? 'bg-[var(--nb-orange)]/30 text-black' : 'bg-[var(--nb-lime)] text-black'"
+                  >
+                    {{ t.status === 'active' ? 'Aktif' : 'Lunas' }}
+                  </span>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Right: Log Scan Member Sesi Ini -->
+      <div class="nb-card bg-white border-2 border-black shadow-[4px_4px_0_#0a0a0a] overflow-hidden">
+        <div class="px-5 py-4 border-b-2 border-black bg-[var(--nb-purple)]/10 flex items-center justify-between">
+          <div class="flex items-center gap-2">
+            <AppIcon name="scan" class="w-4 h-4 text-black" />
+            <h2 class="text-sm font-black text-black">Log Scan Member Sesi Ini</h2>
+          </div>
+          <span class="text-xs px-2.5 py-0.5 rounded-full bg-white border-2 border-black font-mono font-bold text-black shadow-[1px_1px_0_#0a0a0a]">
+            {{ scanHistory.length }} log
+          </span>
+        </div>
+        <div class="divide-y-2 divide-black/10 max-h-72 overflow-y-auto">
+          <div v-if="!scanHistory.length" class="text-center py-10 text-xs text-[var(--nb-muted)] font-bold">
+            Belum ada riwayat verifikasi kartu pada sesi ini
+          </div>
+          <div
+            v-for="(h, i) in scanHistory"
+            :key="i"
+            class="flex items-center justify-between gap-4 px-5 py-3 hover:bg-[#fdfbf4] transition-colors"
+          >
+            <div class="flex items-center gap-3 min-w-0">
+              <span
+                class="w-7 h-7 rounded-lg flex items-center justify-center shrink-0 border-2 border-black font-bold"
+                :class="h.allowed ? 'bg-[#dcfce7] text-[#14532d]' : 'bg-[#fee2e2] text-rose-800'"
+              >
+                <AppIcon :name="h.allowed ? 'check' : 'x'" class="w-4 h-4" />
+              </span>
+              <div class="min-w-0">
+                <div class="flex items-center gap-2">
+                  <span class="text-xs font-extrabold text-[#0a0a0a] truncate">{{ h.name }}</span>
+                  <span class="font-mono text-[10px] font-bold px-1.5 rounded-md bg-[var(--nb-bg)] text-black border border-black">
+                    {{ h.code }}
+                  </span>
+                </div>
+                <p class="text-[11px] text-[var(--nb-muted)] font-medium truncate mt-0.5">{{ h.reason }}</p>
+              </div>
+            </div>
+            <span class="text-xs font-mono font-bold text-[var(--nb-muted)] shrink-0">{{ h.time }}</span>
           </div>
         </div>
       </div>
@@ -368,11 +473,12 @@
 import AppIcon from '~/components/ui/AppIcon.vue'
 
 definePageMeta({ middleware: 'auth' })
-useHead({ title: 'Kasir Tiket — E-Parkir Plaza Andalas' })
+useHead({ title: 'Terminal Kasir & Gate — E-Parkir Plaza Andalas' })
 
 const route = useRoute()
 const { apiFetch } = useApi()
 
+// ── Kasir Non-Member state ───────────────────────────────────────────────────
 const issuingTicket = ref(false)
 const newTicket = ref<any>(null)
 const searchToken = ref('')
@@ -390,6 +496,14 @@ const payForm = reactive({
   cash_received: 0,
 })
 
+// ── Gate Scan Member state ───────────────────────────────────────────────────
+const scanInputRef = ref<HTMLInputElement>()
+const scanCode = ref('')
+const scanning = ref(false)
+const scanResult = ref<any>(null)
+const scanHistory = ref<any[]>([])
+
+// ── Helpers ──────────────────────────────────────────────────────────────────
 function formatRupiah(n: number) {
   return 'Rp ' + (n || 0).toLocaleString('id-ID')
 }
@@ -404,6 +518,7 @@ function formatDateTime(iso: string) {
   })
 }
 
+// ── Kasir functions ──────────────────────────────────────────────────────────
 async function loadTickets() {
   try {
     const today = new Date().toISOString().split('T')[0]
@@ -498,6 +613,44 @@ async function processPayment() {
   }
 }
 
+// ── Gate Scan functions ──────────────────────────────────────────────────────
+async function doScan() {
+  if (!scanCode.value.trim()) return
+  scanning.value = true
+  scanResult.value = null
+  try {
+    const data = await apiFetch<any>('/members/scan', {
+      method: 'POST',
+      body: { member_code: scanCode.value.trim().toUpperCase() },
+    })
+    scanResult.value = data
+    addScanHistory(scanCode.value, data)
+  } catch (e: any) {
+    scanResult.value = e?.data ?? { allowed: false, reason: 'Gagal terhubung ke scanner gate', member: null }
+    addScanHistory(scanCode.value, scanResult.value)
+  } finally {
+    scanning.value = false
+  }
+}
+
+function addScanHistory(code: string, res: any) {
+  scanHistory.value.unshift({
+    code,
+    name: res.member?.name ?? code,
+    allowed: res.allowed,
+    reason: res.reason,
+    time: new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit' }),
+  })
+  if (scanHistory.value.length > 30) scanHistory.value.pop()
+}
+
+function resetScan() {
+  scanResult.value = null
+  scanCode.value = ''
+  nextTick(() => scanInputRef.value?.focus())
+}
+
+// ── Init ─────────────────────────────────────────────────────────────────────
 onMounted(() => {
   loadTickets()
   if (route.query.token) {

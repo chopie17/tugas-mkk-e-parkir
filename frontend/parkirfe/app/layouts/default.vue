@@ -1,33 +1,31 @@
 <template>
-  <div class="flex h-screen overflow-hidden bg-[#070b14] text-slate-100">
+  <div class="flex h-screen overflow-hidden bg-[var(--nb-bg,#f1f1eb)] text-[var(--nb-text,#1c1c1c)]">
     <!-- Sidebar Backdrop for Mobile -->
     <div
       v-if="mobileSidebarOpen"
-      class="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm lg:hidden"
+      class="fixed inset-0 z-40 bg-black/50 backdrop-blur-sm lg:hidden"
       @click="mobileSidebarOpen = false"
     />
 
     <!-- Sidebar -->
     <aside
-      class="fixed inset-y-0 left-0 z-50 flex flex-col bg-[#0b101d] border-r border-slate-800/80 transition-all duration-300 shadow-2xl"
+      class="fixed inset-y-0 left-0 z-50 flex flex-col bg-[#ffffff] border-r-2 border-[#0a0a0a] transition-all duration-300"
       :class="[
-        sidebarOpen ? 'w-64' : 'w-20',
+        sidebarOpen ? 'w-64 shadow-[4px_0_0_#0a0a0a]' : 'w-20 shadow-[4px_0_0_#0a0a0a]',
         mobileSidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
       ]"
     >
       <!-- Brand Logo -->
-      <div class="flex items-center gap-3.5 px-5 h-16 border-b border-slate-800/80 shrink-0">
-        <div class="shrink-0 w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-600 via-indigo-600 to-sky-400 p-0.5 shadow-lg shadow-blue-500/25 flex items-center justify-center">
-          <div class="w-full h-full bg-[#0b101d]/60 rounded-[10px] flex items-center justify-center backdrop-blur-sm">
-            <AppIcon name="gate" class="w-5 h-5 text-white" />
-          </div>
+      <div class="flex items-center gap-3.5 px-5 h-16 border-b-2 border-[#0a0a0a] shrink-0 bg-[#f8fafc]">
+        <div class="shrink-0 w-10 h-10 rounded-xl bg-[var(--nb-lime,#e4ff3a)] border-2 border-[#0a0a0a] shadow-[2px_2px_0_#0a0a0a] flex items-center justify-center">
+          <AppIcon name="gate" class="w-5 h-5 text-black" />
         </div>
         <div v-if="sidebarOpen" class="min-w-0 flex-1 overflow-hidden transition-all duration-200">
           <div class="flex items-center gap-2">
-            <span class="text-sm font-bold tracking-tight text-white">E-PARKIR</span>
-            <span class="px-1.5 py-0.2 rounded text-[10px] font-mono font-bold tracking-wide bg-blue-500/15 text-blue-400 border border-blue-500/20">PRO</span>
+            <span class="text-sm font-extrabold tracking-tight text-[#0a0a0a]">E-PARKIR</span>
+            <span class="px-1.5 py-0.2 rounded-full text-[10px] font-mono font-bold bg-[#dbeafe] text-[#1e40af] border border-[#0a0a0a] shadow-[1px_1px_0_#0a0a0a]">PRO</span>
           </div>
-          <p class="text-[11px] font-medium text-slate-400 tracking-wider uppercase truncate">Plaza Andalas</p>
+          <p class="text-[11px] font-bold text-[var(--nb-muted)] tracking-wider uppercase truncate">Plaza Andalas</p>
         </div>
       </div>
 
@@ -36,32 +34,27 @@
         <div v-for="group in navGroups" :key="group.label" class="space-y-1">
           <p
             v-if="sidebarOpen && group.label"
-            class="px-3 pb-1 text-[11px] font-semibold uppercase tracking-wider text-slate-500"
+            class="px-3 pb-1 text-[11px] font-extrabold uppercase tracking-wider text-[var(--nb-muted)]"
           >
             {{ group.label }}
           </p>
-          <div v-else-if="!sidebarOpen && group.label" class="h-px bg-slate-800/60 my-2 mx-2"></div>
+          <div v-else-if="!sidebarOpen && group.label" class="h-0.5 bg-[#0a0a0a]/20 my-2 mx-2"></div>
 
           <NuxtLink
             v-for="item in group.items"
             :key="item.to"
             :to="item.to"
-            class="group flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-150 relative"
+            class="group flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-bold transition-all duration-150 relative"
             :class="isRouteActive(item.to)
-              ? 'bg-blue-600/15 text-blue-400 border border-blue-500/30 shadow-sm shadow-blue-500/10'
-              : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60 border border-transparent'"
+              ? 'bg-[var(--nb-lime,#e4ff3a)] text-[#0a0a0a] border-2 border-[#0a0a0a] shadow-[3px_3px_0_#0a0a0a]'
+              : 'text-[var(--nb-muted)] hover:text-[#0a0a0a] hover:bg-[#f1f1eb] border-2 border-transparent hover:border-[#0a0a0a]'"
             :title="!sidebarOpen ? item.label : ''"
             @click="mobileSidebarOpen = false"
           >
-            <!-- Active indicator dot/bar -->
-            <span
-              v-if="isRouteActive(item.to)"
-              class="absolute left-0 top-2 bottom-2 w-1 bg-blue-500 rounded-r-full"
-            />
             <AppIcon
               :name="item.icon"
               class="w-5 h-5 shrink-0 transition-transform duration-150 group-hover:scale-105"
-              :class="isRouteActive(item.to) ? 'text-blue-400' : 'text-slate-400 group-hover:text-slate-200'"
+              :class="isRouteActive(item.to) ? 'text-black' : 'text-[var(--nb-muted)] group-hover:text-black'"
             />
             <span v-if="sidebarOpen" class="truncate">{{ item.label }}</span>
           </NuxtLink>
@@ -69,25 +62,25 @@
       </nav>
 
       <!-- User Account & Quick Status -->
-      <div class="p-3 border-t border-slate-800/80 bg-[#090d18]/60 shrink-0">
+      <div class="p-3 border-t-2 border-[#0a0a0a] bg-[#f8fafc] shrink-0">
         <div
-          class="flex items-center gap-3 p-2 rounded-xl bg-slate-900/60 border border-slate-800/80"
+          class="flex items-center gap-3 p-2 rounded-xl bg-white border-2 border-[#0a0a0a] shadow-[2px_2px_0_#0a0a0a]"
           :class="!sidebarOpen ? 'justify-center p-1.5' : ''"
         >
           <div class="relative shrink-0">
-            <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-600 flex items-center justify-center text-sm font-bold text-white shadow-md shadow-blue-600/20">
+            <div class="w-9 h-9 rounded-xl bg-[var(--nb-purple,#6c47ff)] border-2 border-[#0a0a0a] flex items-center justify-center text-sm font-extrabold text-white shadow-[1.5px_1.5px_0_#0a0a0a]">
               {{ userInitial }}
             </div>
             <!-- Online Dot -->
-            <span class="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-emerald-500 border-2 border-[#0b101d] rounded-full"></span>
+            <span class="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-emerald-500 border-2 border-[#0a0a0a] rounded-full"></span>
           </div>
 
           <div v-if="sidebarOpen" class="min-w-0 flex-1">
-            <p class="text-xs font-semibold text-white truncate">{{ authStore.user?.name || 'Petugas' }}</p>
+            <p class="text-xs font-bold text-[#0a0a0a] truncate">{{ authStore.user?.name || 'Petugas' }}</p>
             <div class="flex items-center gap-1.5 mt-0.5">
               <span
-                class="inline-block text-[10px] font-mono font-medium px-1.5 py-0.2 rounded"
-                :class="authStore.isSuperAdmin ? 'bg-purple-500/20 text-purple-300 border border-purple-500/30' : 'bg-blue-500/20 text-blue-300 border border-blue-500/30'"
+                class="inline-block text-[10px] font-mono font-bold px-2 py-0.2 rounded-full border border-[#0a0a0a]"
+                :class="authStore.isSuperAdmin ? 'bg-[#f3e8ff] text-[#6b21a8]' : 'bg-[#dbeafe] text-[#1e40af]'"
               >
                 {{ authStore.user?.role === 'super_admin' ? 'Super Admin' : 'Petugas' }}
               </span>
@@ -96,7 +89,7 @@
 
           <button
             v-if="sidebarOpen"
-            class="p-2 text-slate-400 hover:text-rose-400 hover:bg-rose-500/10 rounded-lg transition-colors"
+            class="p-2 text-slate-500 hover:text-black hover:bg-[#fee2e2] rounded-lg transition-colors border border-transparent hover:border-[#0a0a0a]"
             title="Keluar dari sistem"
             @click="handleLogout"
           >
@@ -106,7 +99,7 @@
 
         <button
           v-if="!sidebarOpen"
-          class="mt-2 w-full flex items-center justify-center p-2 text-slate-400 hover:text-rose-400 hover:bg-rose-500/10 rounded-lg transition-colors"
+          class="mt-2 w-full flex items-center justify-center p-2 text-slate-500 hover:text-black hover:bg-[#fee2e2] rounded-lg transition-colors border border-transparent hover:border-[#0a0a0a]"
           title="Keluar dari sistem"
           @click="handleLogout"
         >
@@ -121,11 +114,11 @@
       :class="sidebarOpen ? 'lg:ml-64' : 'lg:ml-20'"
     >
       <!-- Top Navigation Header -->
-      <header class="h-16 shrink-0 bg-[#0b101d]/90 backdrop-blur-md border-b border-slate-800/80 px-6 flex items-center justify-between z-20">
+      <header class="h-16 shrink-0 bg-[#ffffff] border-b-2 border-[#0a0a0a] px-6 flex items-center justify-between z-20 shadow-[0_2px_0_#0a0a0a]">
         <div class="flex items-center gap-4">
           <!-- Toggle Sidebar Button Desktop -->
           <button
-            class="hidden lg:flex p-2 rounded-xl text-slate-400 hover:text-slate-100 hover:bg-slate-800/70 transition-all border border-transparent hover:border-slate-700/60"
+            class="hidden lg:flex p-2 rounded-xl text-black bg-[#f1f1eb] hover:bg-[var(--nb-lime,#e4ff3a)] transition-all border-2 border-[#0a0a0a] shadow-[2px_2px_0_#0a0a0a]"
             @click="sidebarOpen = !sidebarOpen"
             title="Sembunyikan/Tampilkan Menu"
           >
@@ -134,7 +127,7 @@
 
           <!-- Mobile Hamburger Toggle -->
           <button
-            class="flex lg:hidden p-2 rounded-xl text-slate-400 hover:text-slate-100 hover:bg-slate-800/70"
+            class="flex lg:hidden p-2 rounded-xl text-black bg-[#f1f1eb] hover:bg-[var(--nb-lime,#e4ff3a)] border-2 border-[#0a0a0a] shadow-[2px_2px_0_#0a0a0a]"
             @click="mobileSidebarOpen = !mobileSidebarOpen"
           >
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -144,35 +137,43 @@
 
           <!-- Current Route Title Breadcrumb -->
           <div class="flex items-center gap-2 text-sm">
-            <span class="text-slate-400 font-medium">Plaza Andalas</span>
-            <span class="text-slate-600">/</span>
-            <span class="font-semibold text-slate-200">{{ currentRouteName }}</span>
+            <span class="text-[var(--nb-muted)] font-bold">Plaza Andalas</span>
+            <span class="text-[#0a0a0a] font-black">/</span>
+            <span class="font-black text-[#0a0a0a]">{{ currentRouteName }}</span>
           </div>
         </div>
 
         <!-- Right Side Stats / Info -->
-        <div class="flex items-center gap-4">
+        <div class="flex items-center gap-3">
           <!-- Live Terminal Badge -->
-          <div class="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-full bg-slate-900/90 border border-slate-800 text-xs">
+          <div class="hidden md:flex items-center gap-2 px-3 py-1 rounded-full bg-[#dcfce7] border-2 border-[#0a0a0a] shadow-[2px_2px_0_#0a0a0a] text-xs font-bold">
             <span class="relative flex h-2 w-2">
-              <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-              <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+              <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-500 opacity-75"></span>
+              <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-600"></span>
             </span>
-            <span class="text-slate-400 font-medium">Terminal Gate 01</span>
-            <span class="text-slate-600">·</span>
-            <span class="text-emerald-400 font-medium">Online</span>
+            <span class="text-[#14532d]">Gate 01 Online</span>
           </div>
 
           <!-- Realtime Date & Time -->
-          <div class="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-900/80 border border-slate-800/80 text-xs text-slate-300 font-mono">
-            <AppIcon name="clock" class="w-3.5 h-3.5 text-blue-400" />
+          <div class="flex items-center gap-2 px-3 py-1 rounded-full bg-[#ffffff] border-2 border-[#0a0a0a] shadow-[2px_2px_0_#0a0a0a] text-xs text-[#0a0a0a] font-mono font-bold">
+            <AppIcon name="clock" class="w-3.5 h-3.5 text-[#0a0a0a]" />
             <span>{{ liveTimeString }}</span>
           </div>
+
+          <!-- Back to Kiosk Landing Link -->
+          <NuxtLink
+            to="/"
+            class="hidden sm:flex items-center gap-1.5 px-3 py-1 rounded-full bg-[var(--nb-lime,#e4ff3a)] hover:bg-[#d4f826] border-2 border-[#0a0a0a] shadow-[2px_2px_0_#0a0a0a] text-xs font-black text-[#0a0a0a]"
+            title="Buka Terminal Gerbang Masuk"
+          >
+            <AppIcon name="gate" class="w-3.5 h-3.5" />
+            <span>Kiosk Masuk</span>
+          </NuxtLink>
         </div>
       </header>
 
       <!-- Main Content Scroll Area -->
-      <main class="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8">
+      <main class="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 bg-[var(--nb-bg,#f1f1eb)]">
         <slot />
       </main>
     </div>
@@ -196,12 +197,12 @@ const userInitial = computed(() => {
 const currentRouteName = computed(() => {
   const path = route.path
   if (path.startsWith('/dashboard')) return 'Dashboard'
-  if (path.startsWith('/tiket')) return 'Tiket Masuk & Kasir'
+  if (path.startsWith('/tiket')) return 'Terminal Kasir & Gate'
   if (path.startsWith('/scan')) return 'Gate Scan Member'
   if (path.startsWith('/members')) return 'Data Keanggotaan'
   if (path.startsWith('/tagihan')) return 'Tagihan Bulanan'
   if (path.startsWith('/laporan')) return 'Laporan Transaksi'
-  if (path.startsWith('/users')) return 'Manajemen Petugas'
+  if (path.startsWith('/users')) return 'Manajemen Pengguna'
   if (path.startsWith('/tariff')) return 'Pengaturan Tarif'
   return 'Dashboard'
 })
@@ -244,13 +245,30 @@ onUnmounted(() => {
 })
 
 const navGroups = computed(() => {
-  const groups = [
+  if (authStore.isSuperAdmin) {
+    return [
+      {
+        items: [
+          { to: '/dashboard', label: 'Dashboard', icon: 'dashboard' },
+          { to: '/laporan', label: 'Laporan Transaksi', icon: 'report' },
+          { to: '/users', label: 'Manajemen Pengguna', icon: 'user' },
+          { to: '/tariff', label: 'Pengaturan Tarif', icon: 'tariff' },
+        ],
+      },
+      {
+        items: [
+
+        ],
+      },
+    ]
+  }
+
+  return [
     {
       label: 'OPERASIONAL',
       items: [
         { to: '/dashboard', label: 'Dashboard', icon: 'dashboard' },
-        { to: '/tiket', label: 'Tiket Non-Member', icon: 'ticket' },
-        { to: '/scan', label: 'Gate Scan Member', icon: 'scan' },
+        { to: '/tiket', label: 'Kasir & Gate', icon: 'ticket' },
       ],
     },
     {
@@ -267,18 +285,6 @@ const navGroups = computed(() => {
       ],
     },
   ]
-
-  if (authStore.isSuperAdmin) {
-    groups.push({
-      label: 'SISTEM & TARIF',
-      items: [
-        { to: '/users', label: 'Manajemen Pengguna', icon: 'user' },
-        { to: '/tariff', label: 'Pengaturan Tarif', icon: 'tariff' },
-      ],
-    })
-  }
-
-  return groups
 })
 
 async function handleLogout() {

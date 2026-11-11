@@ -1,17 +1,17 @@
 <template>
   <div
     v-if="meta && meta.last_page > 1"
-    class="flex flex-col sm:flex-row items-center justify-between gap-3 px-6 py-4 border-t border-slate-800/80 bg-slate-900/40"
+    class="flex flex-col sm:flex-row items-center justify-between gap-3 px-6 py-4 border-t-2 border-[#0a0a0a] bg-[#f8fafc]"
   >
-    <div class="text-xs text-slate-400">
-      Menampilkan <span class="font-semibold text-slate-200">{{ rangeStart }}</span> -
-      <span class="font-semibold text-slate-200">{{ rangeEnd }}</span> dari
-      <span class="font-semibold text-slate-200">{{ meta.total ?? 0 }}</span> data
+    <div class="text-xs font-bold text-[var(--nb-muted)]">
+      Menampilkan <span class="font-black text-[#0a0a0a]">{{ rangeStart }}</span> -
+      <span class="font-black text-[#0a0a0a]">{{ rangeEnd }}</span> dari
+      <span class="font-black text-[#0a0a0a]">{{ meta.total ?? 0 }}</span> data
     </div>
 
     <div class="flex items-center gap-2">
       <button
-        class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all text-slate-300 hover:text-white bg-slate-800/80 hover:bg-slate-700 border border-slate-700/80 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-slate-800/80"
+        class="nb-btn nb-btn-sm bg-white flex items-center gap-1.5"
         :disabled="page <= 1"
         @click="$emit('prev')"
       >
@@ -19,12 +19,12 @@
         <span>Sebelumnya</span>
       </button>
 
-      <div class="px-3 py-1 rounded-lg bg-slate-950/60 border border-slate-800 text-xs font-mono text-slate-300">
-        Halaman <span class="text-blue-400 font-semibold">{{ page }}</span> / {{ meta.last_page }}
+      <div class="px-3 py-1 rounded-xl bg-white border-2 border-[#0a0a0a] text-xs font-mono font-black text-[#0a0a0a] shadow-[1.5px_1.5px_0_#0a0a0a]">
+        Halaman <span class="text-[var(--nb-purple,#6c47ff)]">{{ page }}</span> / {{ meta.last_page }}
       </div>
 
       <button
-        class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all text-slate-300 hover:text-white bg-slate-800/80 hover:bg-slate-700 border border-slate-700/80 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-slate-800/80"
+        class="nb-btn nb-btn-sm bg-white flex items-center gap-1.5"
         :disabled="page >= meta.last_page"
         @click="$emit('next')"
       >

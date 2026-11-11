@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\BillController;
+use App\Http\Controllers\Api\GateController;
 use App\Http\Controllers\Api\MemberController;
 use App\Http\Controllers\Api\MemberScanController;
 use App\Http\Controllers\Api\ReportController;
@@ -27,6 +28,14 @@ use Illuminate\Support\Facades\Route;
 */
 
 // ─── Route Publik (Tanpa Autentikasi) ────────────────────────────────────────
+
+/** Terminal Gerbang Mandiri (Kiosk Gate Entrance & Exit) */
+Route::prefix('gate')->group(function () {
+    Route::post('/tickets/dispense',  [GateController::class, 'dispenseTicket']);
+    Route::post('/members/scan',      [GateController::class, 'scanMember']);
+    Route::post('/tickets/scan-exit', [GateController::class, 'scanExitTicket']);
+    Route::post('/tickets/pay-exit',  [GateController::class, 'payExitTicket']);
+});
 
 /** Tarif parkir — publik agar bisa tampil di display gate */
 Route::get('/tariffs', [TariffController::class, 'index']);

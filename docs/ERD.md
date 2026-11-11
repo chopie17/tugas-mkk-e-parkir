@@ -30,6 +30,9 @@ erDiagram
         enum vehicle_category "motor|mobil"
         int monthly_fee
         boolean is_active
+        enum parking_status "out|in"
+        datetime last_entry_at NULL
+        datetime last_exit_at NULL
         bigint created_by FK
         timestamps created_at updated_at deleted_at
     }
@@ -51,6 +54,7 @@ erDiagram
     member_entries {
         bigint id PK
         bigint member_id FK
+        enum direction "in|out"
         datetime scanned_at
         enum result "allowed|denied"
         string reason NULL

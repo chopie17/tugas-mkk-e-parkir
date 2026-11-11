@@ -25,6 +25,7 @@ class MemberEntry extends Model
 
     protected $fillable = [
         'member_id',
+        'direction',
         'scanned_at',
         'result',
         'reason',

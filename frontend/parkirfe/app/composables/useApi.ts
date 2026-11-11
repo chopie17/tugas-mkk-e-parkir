@@ -6,8 +6,19 @@ export function useApi() {
   const config = useRuntimeConfig()
   const authStore = useAuthStore()
 
+  // Dynamic Base URL: menyesuaikan dengan IP/host tempat frontend dibuka (komputer atau HP)
+  let baseUrl = config.public.apiBase || 'http://localhost:8000/api'
+  if (import.meta.client && typeof window !== 'undefined') {
+    const currentHost = window.location.hostname
+    if (baseUrl.includes('localhost') && currentHost !== 'localhost' && currentHost !== '127.0.0.1') {
+      baseUrl = baseUrl.replace('localhost', currentHost)
+    } else if (baseUrl.includes('127.0.0.1') && currentHost !== 'localhost' && currentHost !== '127.0.0.1') {
+      baseUrl = baseUrl.replace('127.0.0.1', currentHost)
+    }
+  }
+
   const apiFetch = $fetch.create({
-    baseURL: config.public.apiBase,
+    baseURL: baseUrl,
     onRequest({ options }) {
       if (authStore.token) {
         options.headers = {

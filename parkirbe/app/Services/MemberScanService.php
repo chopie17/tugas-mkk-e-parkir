@@ -9,12 +9,16 @@ use App\Models\Member;
 use App\Models\MemberEntry;
 
 /**
- * MemberScanService memproses scan kartu member di pintu masuk.
+ * MemberScanService memproses scan kartu member di pintu masuk dan pintu keluar.
  *
  * Alur verifikasi:
- * 1. Cek apakah kode ada dan member aktif
+ * 1. Cek apakah kode/plat ada dan member aktif
  * 2. Cek apakah ada tagihan belum lunas
- * 3. Catat hasil scan ke tabel member_entries
+ * 3. Logika Anti-Passback (arah 'in' vs 'out'):
+ *    - Masuk ('in'): hanya boleh jika status member 'out'. Jika 'in', ditolak karena sudah di dalam.
+ *    - Keluar ('out'): hanya boleh jika status member 'in'. Jika 'out', ditolak karena belum masuk.
+ * 4. Update status posisi member (parking_status)
+ * 5. Catat riwayat scan ke tabel member_entries
  */
 class MemberScanService
 {
@@ -23,67 +27,124 @@ class MemberScanService
     ) {}
 
     /**
-     * Proses scan kartu member.
-     * Selalu mencatat hasil scan ke member_entries (untuk audit trail).
+     * Proses scan kartu member (masuk atau keluar).
      *
-     * @param string $code Kode member dari QR (mis. MBR-XXXXXXXX)
-     * @return array{allowed: bool, reason: string, member: Member|null}
+     * @param string $code       Kode member dari QR (mis. MBR-XXXXXXXX) atau Plat Nomor
+     * @param string $direction  Arah: 'in' (pintu masuk) atau 'out' (pintu keluar)
+     * @return array{allowed: bool, reason: string, direction: string, member: Member|null}
      */
-    public function scan(string $code): array
+    public function scan(string $code, string $direction = 'in'): array
     {
-        $code   = strtoupper(trim($code));
-        $member = Member::where('member_code', $code)->first();
+        $direction = strtolower($direction) === 'out' ? 'out' : 'in';
+        $normalized = strtoupper(trim($code));
 
-        // Kode tidak ditemukan
+        // Cari berdasarkan member_code ATAU plate_number (untuk kemudahan input manual)
+        $member = Member::where('member_code', $normalized)
+            ->orWhere('plate_number', $normalized)
+            ->first();
+
+        // 1. Kode / plat tidak ditemukan
         if (!$member) {
             return [
-                'allowed' => false,
-                'reason'  => 'Kartu tidak valid.',
-                'member'  => null,
+                'allowed'   => false,
+                'reason'    => 'Kartu atau data member tidak ditemukan.',
+                'direction' => $direction,
+                'member'    => null,
             ];
         }
 
-        // Member tidak aktif
+        // 2. Member tidak aktif
         if (!$member->is_active) {
-            $this->recordEntry($member, EntryResult::Denied, 'Member tidak aktif.');
+            $this->recordEntry($member, $direction, EntryResult::Denied, 'Member non-aktif.');
             return [
-                'allowed' => false,
-                'reason'  => 'Kartu tidak valid. Member tidak aktif.',
-                'member'  => $member,
+                'allowed'   => false,
+                'reason'    => 'Kartu tidak valid. Status member non-aktif.',
+                'direction' => $direction,
+                'member'    => $member,
             ];
         }
 
-        // Ada tagihan belum lunas
+        // 3. Ada tagihan belum lunas
         if ($this->billService->hasUnpaid($member)) {
-            $reason = 'Tagihan belum lunas, silakan bayar ke petugas.';
-            $this->recordEntry($member, EntryResult::Denied, $reason);
+            $reason = 'Tagihan iuran bulanan belum lunas. Silakan lakukan pembayaran ke kasir.';
+            $this->recordEntry($member, $direction, EntryResult::Denied, $reason);
             return [
-                'allowed' => false,
-                'reason'  => $reason,
-                'member'  => $member,
+                'allowed'   => false,
+                'reason'    => $reason,
+                'direction' => $direction,
+                'member'    => $member,
             ];
         }
 
-        // Semua OK — diterima
-        $this->recordEntry($member, EntryResult::Allowed, null);
-        return [
-            'allowed' => true,
-            'reason'  => 'Silakan masuk.',
-            'member'  => $member,
-        ];
+        // 4. Logika Anti-Passback
+        $currentStatus = $member->parking_status ?? 'out';
+
+        if ($direction === 'in') {
+            // Jika scan masuk, tapi statusnya sudah di dalam (IN)
+            if ($currentStatus === 'in') {
+                $reason = 'Akses Masuk Ditolak: Kendaraan sudah tercatat berada di dalam area parkir (Anti-Passback).';
+                $this->recordEntry($member, $direction, EntryResult::Denied, $reason);
+                return [
+                    'allowed'   => false,
+                    'reason'    => $reason,
+                    'direction' => $direction,
+                    'member'    => $member,
+                ];
+            }
+
+            // Valid: Berhasil masuk
+            $member->update([
+                'parking_status' => 'in',
+                'last_entry_at'  => now(),
+            ]);
+
+            $this->recordEntry($member, $direction, EntryResult::Allowed, null);
+
+            return [
+                'allowed'   => true,
+                'reason'    => 'Akses Masuk Berhasil. Gerbang dibuka.',
+                'direction' => $direction,
+                'member'    => $member->fresh(),
+            ];
+        } else {
+            // Direction = 'out'
+            // Jika scan keluar, tapi statusnya belum masuk (OUT)
+            if ($currentStatus !== 'in') {
+                $reason = 'Akses Keluar Ditolak: Kendaraan belum tercatat masuk ke area parkir.';
+                $this->recordEntry($member, $direction, EntryResult::Denied, $reason);
+                return [
+                    'allowed'   => false,
+                    'reason'    => $reason,
+                    'direction' => $direction,
+                    'member'    => $member,
+                ];
+            }
+
+            // Valid: Berhasil keluar
+            $member->update([
+                'parking_status' => 'out',
+                'last_exit_at'   => now(),
+            ]);
+
+            $this->recordEntry($member, $direction, EntryResult::Allowed, null);
+
+            return [
+                'allowed'   => true,
+                'reason'    => 'Akses Keluar Berhasil. Gerbang dibuka. Terima kasih.',
+                'direction' => $direction,
+                'member'    => $member->fresh(),
+            ];
+        }
     }
 
     /**
      * Catat hasil scan ke tabel member_entries.
-     *
-     * @param Member       $member
-     * @param EntryResult  $result
-     * @param string|null  $reason
      */
-    private function recordEntry(Member $member, EntryResult $result, ?string $reason): void
+    private function recordEntry(Member $member, string $direction, EntryResult $result, ?string $reason): void
     {
         MemberEntry::create([
             'member_id'  => $member->id,
+            'direction'  => $direction,
             'scanned_at' => now(),
             'result'     => $result,
             'reason'     => $reason,
