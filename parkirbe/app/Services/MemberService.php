@@ -37,7 +37,10 @@ class MemberService
             $member = Member::create([
                 'member_code'      => $this->generateMemberCode(),
                 'name'             => $data['name'],
-                'plate_number'     => strtoupper(trim($data['plate_number'])),
+                'company_name'     => isset($data['company_name']) ? trim((string)$data['company_name']) : null,
+                'plate_number'     => !empty($data['plate_number']) ? strtoupper(trim((string)$data['plate_number'])) : null,
+                'phone_number'     => isset($data['phone_number']) ? trim((string)$data['phone_number']) : null,
+                'email'            => isset($data['email']) ? strtolower(trim((string)$data['email'])) : null,
                 'vehicle_category' => $category,
                 'monthly_fee'      => $monthlyFee,
                 'is_active'        => true,
@@ -63,8 +66,11 @@ class MemberService
     {
         return DB::transaction(function () use ($member, $data) {
             $updateData = array_filter([
-                'name'      => $data['name'] ?? null,
-                'is_active' => isset($data['is_active']) ? (bool) $data['is_active'] : null,
+                'name'         => $data['name'] ?? null,
+                'company_name' => array_key_exists('company_name', $data) ? ($data['company_name'] ? trim((string)$data['company_name']) : null) : null,
+                'phone_number' => array_key_exists('phone_number', $data) ? ($data['phone_number'] ? trim((string)$data['phone_number']) : null) : null,
+                'email'        => array_key_exists('email', $data) ? ($data['email'] ? strtolower(trim((string)$data['email'])) : null) : null,
+                'is_active'    => isset($data['is_active']) ? (bool) $data['is_active'] : null,
             ], fn($v) => $v !== null);
 
             if (isset($data['plate_number'])) {

@@ -30,16 +30,8 @@
       </div>
 
       <!-- Navigation Links -->
-      <nav class="flex-1 py-4 px-3 space-y-6 overflow-y-auto">
-        <div v-for="group in navGroups" :key="group.label" class="space-y-1">
-          <p
-            v-if="sidebarOpen && group.label"
-            class="px-3 pb-1 text-[11px] font-extrabold uppercase tracking-wider text-[var(--nb-muted)]"
-          >
-            {{ group.label }}
-          </p>
-          <div v-else-if="!sidebarOpen && group.label" class="h-0.5 bg-[#0a0a0a]/20 my-2 mx-2"></div>
-
+      <nav class="flex-1 py-4 px-3 space-y-1.5 overflow-y-auto">
+        <template v-for="group in navGroups" :key="group.label || 'nav'">
           <NuxtLink
             v-for="item in group.items"
             :key="item.to"
@@ -58,7 +50,7 @@
             />
             <span v-if="sidebarOpen" class="truncate">{{ item.label }}</span>
           </NuxtLink>
-        </div>
+        </template>
       </nav>
 
       <!-- User Account & Quick Status -->
@@ -87,9 +79,10 @@
             </div>
           </div>
 
+          <!-- Tombol Keluar (Di dalam kolom akun) -->
           <button
             v-if="sidebarOpen"
-            class="p-2 text-slate-500 hover:text-black hover:bg-[#fee2e2] rounded-lg transition-colors border border-transparent hover:border-[#0a0a0a]"
+            class="p-2 text-slate-500 hover:text-black hover:bg-[#fee2e2] rounded-lg transition-colors border border-transparent hover:border-[#0a0a0a] shrink-0"
             title="Keluar dari sistem"
             @click="handleLogout"
           >
@@ -160,14 +153,14 @@
             <span>{{ liveTimeString }}</span>
           </div>
 
-          <!-- Back to Kiosk Landing Link -->
+          <!-- Profile Link -->
           <NuxtLink
-            to="/"
-            class="hidden sm:flex items-center gap-1.5 px-3 py-1 rounded-full bg-[var(--nb-lime,#e4ff3a)] hover:bg-[#d4f826] border-2 border-[#0a0a0a] shadow-[2px_2px_0_#0a0a0a] text-xs font-black text-[#0a0a0a]"
-            title="Buka Terminal Gerbang Masuk"
+            to="/profile"
+            class="hidden sm:flex items-center gap-1.5 px-3 py-1 rounded-full bg-white hover:bg-[#f1f1eb] border-2 border-[#0a0a0a] shadow-[2px_2px_0_#0a0a0a] text-xs font-black text-[#0a0a0a]"
+            title="Edit profil akun saya"
           >
-            <AppIcon name="gate" class="w-3.5 h-3.5" />
-            <span>Kiosk Masuk</span>
+            <AppIcon name="user" class="w-3.5 h-3.5" />
+            <span>Profil</span>
           </NuxtLink>
         </div>
       </header>
@@ -204,6 +197,7 @@ const currentRouteName = computed(() => {
   if (path.startsWith('/laporan')) return 'Laporan Transaksi'
   if (path.startsWith('/users')) return 'Manajemen Pengguna'
   if (path.startsWith('/tariff')) return 'Pengaturan Tarif'
+  if (path.startsWith('/profile')) return 'Profil Akun'
   return 'Dashboard'
 })
 
@@ -255,32 +249,15 @@ const navGroups = computed(() => {
           { to: '/tariff', label: 'Pengaturan Tarif', icon: 'tariff' },
         ],
       },
-      {
-        items: [
-
-        ],
-      },
     ]
   }
 
   return [
     {
-      label: 'OPERASIONAL',
       items: [
         { to: '/dashboard', label: 'Dashboard', icon: 'dashboard' },
         { to: '/tiket', label: 'Kasir & Gate', icon: 'ticket' },
-      ],
-    },
-    {
-      label: 'KEANGGOTAAN',
-      items: [
         { to: '/members', label: 'Data Member', icon: 'users' },
-        { to: '/tagihan', label: 'Tagihan Member', icon: 'card' },
-      ],
-    },
-    {
-      label: 'LAPORAN & ANALITIK',
-      items: [
         { to: '/laporan', label: 'Laporan Transaksi', icon: 'report' },
       ],
     },

@@ -18,10 +18,12 @@ class UpdateMemberRequest extends FormRequest
 
     public function rules(): array
     {
-        $memberId = $this->route('member')->id;
         return [
             'name'             => 'sometimes|required|string|max:255',
-            'plate_number'     => ['sometimes','required','string','max:20', Rule::unique('members')->ignore($memberId)],
+            'company_name'     => 'nullable|string|max:255',
+            'plate_number'     => 'nullable|string|max:20',
+            'phone_number'     => 'nullable|string|max:25',
+            'email'            => 'nullable|email|max:100',
             'vehicle_category' => ['sometimes','required', new Enum(VehicleCategory::class)],
             'is_active'        => 'sometimes|required|boolean',
         ];

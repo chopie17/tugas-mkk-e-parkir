@@ -44,4 +44,22 @@ return Application::configure(basePath: dirname(__DIR__))
                 ], $e->getStatusCode());
             }
         });
+
+        // Handler untuk ModelNotFoundException (misal data ID atau token tidak ditemukan)
+        $exceptions->render(function (\Illuminate\Database\Eloquent\ModelNotFoundException $e, Request $request) {
+            if ($request->is('api/*') || $request->expectsJson()) {
+                $modelName = class_basename($e->getModel());
+                $label = match ($modelName) {
+                    'ParkingTicket' => 'Tiket parkir',
+                    'Member'        => 'Data member',
+                    'MemberBill'    => 'Tagihan member',
+                    'User'          => 'Data pengguna',
+                    default         => 'Data',
+                };
+                return response()->json([
+                    'message' => "{$label} tidak ditemukan dalam sistem.",
+                    'error'   => 'NotFound',
+                ], 404);
+            }
+        });
     })->create();

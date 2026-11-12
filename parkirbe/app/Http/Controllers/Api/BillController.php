@@ -113,4 +113,23 @@ class BillController extends Controller
             'generated' => $count,
         ]);
     }
+
+    /**
+     * Kirim pesan pengingat tagihan ke WhatsApp (Fonnte) dan/atau Email member.
+     * Opsi channel: 'auto' (default), 'whatsapp', atau 'email'.
+     *
+     * @param Request    $request
+     * @param MemberBill $bill
+     * @return JsonResponse
+     */
+    public function remind(Request $request, MemberBill $bill): JsonResponse
+    {
+        $channel = (string) $request->input('channel', 'auto');
+        $result  = $this->billService->sendReminder($bill, $channel);
+
+        return response()->json([
+            'message' => 'Proses pengiriman pengingat tagihan selesai.',
+            'detail'  => $result,
+        ]);
+    }
 }

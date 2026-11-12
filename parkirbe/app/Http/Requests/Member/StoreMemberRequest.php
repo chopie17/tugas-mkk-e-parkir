@@ -19,7 +19,10 @@ class StoreMemberRequest extends FormRequest
     {
         return [
             'name'             => 'required|string|max:255',
-            'plate_number'     => 'required|string|max:20|unique:members,plate_number',
+            'company_name'     => 'nullable|string|max:255',
+            'plate_number'     => 'nullable|string|max:20',
+            'phone_number'     => 'nullable|string|max:25',
+            'email'            => 'nullable|email|max:100',
             'vehicle_category' => ['required', new Enum(VehicleCategory::class)],
         ];
     }
@@ -28,8 +31,7 @@ class StoreMemberRequest extends FormRequest
     {
         return [
             'name.required'             => 'Nama member wajib diisi.',
-            'plate_number.required'     => 'Plat nomor wajib diisi.',
-            'plate_number.unique'       => 'Plat nomor sudah terdaftar sebagai member.',
+            'email.email'               => 'Format email tidak valid.',
             'vehicle_category.required' => 'Kategori kendaraan wajib dipilih.',
         ];
     }

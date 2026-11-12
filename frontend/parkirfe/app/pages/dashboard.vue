@@ -308,9 +308,13 @@
     <!-- Recent Transactions Table -->
     <div class="nb-card bg-white border-2 border-black shadow-[4px_4px_0_#0a0a0a] rounded-2xl overflow-hidden">
       <div class="px-6 py-4 border-b-2 border-black flex items-center justify-between bg-[var(--nb-yellow)]/20">
-        <div class="flex items-center gap-2">
+        <div class="flex items-center gap-2.5">
           <AppIcon name="receipt" class="w-4 h-4 text-black" />
           <h2 class="text-sm font-black text-[#0a0a0a]">Transaksi Kasir Terakhir Hari Ini</h2>
+          <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-mono font-bold bg-white border border-black shadow-[1px_1px_0_#0a0a0a]">
+            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+            <span>Live Sync</span>
+          </span>
         </div>
         <NuxtLink to="/laporan" class="text-xs font-bold text-[var(--nb-purple)] hover:underline flex items-center gap-1">
           <span>Lihat Semua Laporan</span>
@@ -322,54 +326,121 @@
         <table class="data-table">
           <thead>
             <tr>
-              <th>Invoice / Token</th>
-              <th>Kategori</th>
-              <th>Kendaraan / Keterangan</th>
-              <th>Biaya / Jumlah</th>
-              <th>Waktu Transaksi</th>
+              <th>Kode Tiket</th>
+              <th>Plat Nomor</th>
+              <th>Kendaraan</th>
+              <th>Masuk Jam</th>
+              <th>Keluar Jam</th>
+              <th>Total Bayar</th>
               <th>Status</th>
             </tr>
           </thead>
           <tbody>
-            <tr v-if="recentLoading">
-              <td colspan="6" class="text-center py-10 text-xs text-[var(--nb-muted)]">
+            <tr v-if="recentLoading && !recentTransactions.length">
+              <td colspan="7" class="text-center py-10 text-xs text-[var(--nb-muted)]">
                 <div class="flex items-center justify-center gap-2 font-bold">
                   <svg class="w-4 h-4 animate-spin text-black" fill="none" viewBox="0 0 24 24">
                     <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
                     <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
                   </svg>
-                  <span>Memuat data transaksi...</span>
+                  <span>Memuat data aktivitas parkir hari ini...</span>
                 </div>
               </td>
             </tr>
 
             <tr v-else-if="!recentTransactions.length">
-              <td colspan="6" class="text-center py-12 text-black/60">
+              <td colspan="7" class="text-center py-12 text-black/60">
                 <AppIcon name="receipt" class="w-8 h-8 mx-auto mb-2 text-black/40" />
-                <p class="text-sm font-bold text-black">Belum ada pembayaran hari ini</p>
-                <p class="text-xs text-[var(--nb-muted)] mt-1 font-medium">Transaksi yang dibayar akan muncul otomatis di sini.</p>
+                <p class="text-sm font-bold text-black">Belum ada aktivitas parkir hari ini</p>
+                <p class="text-xs text-[var(--nb-muted)] mt-1 font-medium">Kendaraan yang baru masuk atau keluar akan otomatis tampil di sini secara realtime.</p>
               </td>
             </tr>
 
-            <tr v-for="trx in recentTransactions" :key="trx.id + trx.type">
+            <tr v-for="trx in recentTransactions" :key="trx.id">
+              <!-- 1. Kode Tiket -->
               <td>
-                <span class="font-mono text-xs font-black px-2 py-1 rounded bg-[var(--nb-bg)] text-black border-2 border-black shadow-[1px_1px_0_#0a0a0a]">
-                  {{ trx.invoice_number || trx.token }}
-                </span>
+                <div class="flex items-center gap-1.5">
+                  <span class="font-mono text-xs font-black px-2 py-0.5 rounded bg-[var(--nb-bg)] text-black border-2 border-black shadow-[1px_1px_0_#0a0a0a]">
+                    {{ trx.token }}
+                  </span>
+                  <span
+                    class="text-[10px] font-bold px-1.5 py-0.2 rounded border border-black"
+                    :class="trx.type === 'member' ? 'bg-purple-100 text-purple-900' : 'bg-teal-100 text-teal-900'"
+                  >
+                    {{ trx.type === 'member' ? 'Member' : 'Umum' }}
+                  </span>
+                </div>
               </td>
+
+              <!-- 2. Plat Nomor -->
               <td>
                 <span
-                  class="text-xs px-2.5 py-0.5 rounded-full font-bold border-2 border-black shadow-[1px_1px_0_#0a0a0a]"
-                  :class="trx.type === 'member' ? 'bg-[var(--nb-purple)] text-white' : 'bg-[var(--nb-teal)]/30 text-black'"
+                  v-if="trx.plate_number"
+                  class="font-mono font-black text-xs px-2 py-0.5 rounded bg-gray-100 text-black border border-black shadow-[1px_1px_0_#0a0a0a] uppercase whitespace-nowrap"
                 >
-                  {{ trx.type === 'member' ? 'Member' : 'Non-Member' }}
+                  {{ trx.plate_number }}
+                </span>
+                <span v-else class="text-[11px] text-[var(--nb-muted)] italic font-medium">
+                  (Diinput saat keluar)
                 </span>
               </td>
-              <td class="font-bold text-[#0a0a0a]">{{ trx.vehicle }}</td>
-              <td class="font-mono font-black text-[#0a0a0a]">{{ formatRupiah(trx.amount) }}</td>
-              <td class="text-xs font-mono font-bold text-[var(--nb-ink)]">{{ formatTime(trx.time) }} WIB</td>
+
+              <!-- 3. Kendaraan -->
               <td>
-                <span class="nb-pill bg-[var(--nb-lime)] text-black border-2 border-black text-xs font-black shadow-[1px_1px_0_#0a0a0a]">Lunas</span>
+                <div v-if="trx.vehicle_category" class="flex items-center gap-1 text-xs font-bold text-black capitalize">
+                  <AppIcon :name="trx.vehicle_category === 'motor' ? 'motorcycle' : 'car'" class="w-3.5 h-3.5 text-black/70" />
+                  <span>{{ trx.vehicle_category === 'motor' ? 'Motor' : 'Mobil' }}</span>
+                </div>
+                <span v-else class="text-[11px] text-[var(--nb-muted)]">
+                  Pilih saat keluar
+                </span>
+              </td>
+
+              <!-- 4. Jam Masuk -->
+              <td class="text-xs font-mono font-bold text-black">
+                <div class="flex items-center gap-1">
+                  <AppIcon name="clock" class="w-3 h-3 text-black/50" />
+                  <span>{{ formatTime(trx.entry_at) }} WIB</span>
+                </div>
+              </td>
+
+              <!-- 5. Jam Keluar -->
+              <td class="text-xs font-mono font-bold">
+                <span v-if="trx.exit_at" class="text-black">
+                  {{ formatTime(trx.exit_at) }} WIB
+                </span>
+                <span v-else class="text-amber-800 bg-amber-50 px-1.5 py-0.5 rounded border border-amber-300 text-[10px]">
+                  Masih di dalam
+                </span>
+              </td>
+
+              <!-- 6. Total Bayar -->
+              <td class="font-mono text-xs font-black">
+                <span v-if="trx.type === 'member'" class="text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded border border-emerald-500 font-bold">
+                  Rp 0 (Member)
+                </span>
+                <span v-else-if="trx.status === 'paid'" class="text-black font-extrabold">
+                  {{ formatRupiah(trx.fee) }}
+                </span>
+                <span v-else class="text-[11px] text-[var(--nb-muted)] font-normal italic">
+                  Dihitung saat keluar
+                </span>
+              </td>
+
+              <!-- 7. Status -->
+              <td>
+                <span
+                  v-if="trx.status === 'active'"
+                  class="nb-pill bg-[var(--nb-yellow)] text-black border-2 border-black text-xs font-black shadow-[1px_1px_0_#0a0a0a]"
+                >
+                  Masih Parkir
+                </span>
+                <span
+                  v-else
+                  class="nb-pill bg-[var(--nb-lime)] text-black border-2 border-black text-xs font-black shadow-[1px_1px_0_#0a0a0a]"
+                >
+                  Lunas / Keluar
+                </span>
               </td>
             </tr>
           </tbody>
@@ -503,16 +574,21 @@ const categoryBreakdown = computed(() => {
   }
 })
 
-async function loadData() {
-  recentLoading.value = true
+let pollTimer: ReturnType<typeof setInterval> | null = null
+
+async function loadData(isPolling = false) {
+  if (!isPolling) {
+    recentLoading.value = true
+  }
   try {
     const today = getTodayDate()
     
-    // Safely fetch all 3 endpoints so one failure does not break the other data
-    const [summaryRes, nonMemberRes, memberRes] = await Promise.allSettled([
+    // Safely fetch all endpoints so one failure does not break the other data
+    const [summaryRes, nonMemberRes, memberRes, activityRes] = await Promise.allSettled([
       apiFetch<any>('/reports/summary'),
       apiFetch<any>(`/reports/non-member?per_page=50&date_from=${today}`),
       apiFetch<any>(`/reports/member?per_page=50&date_from=${today}`),
+      apiFetch<any>('/reports/today-activity'),
     ])
 
     if (summaryRes.status === 'fulfilled' && summaryRes.value) {
@@ -525,29 +601,38 @@ async function loadData() {
     rawNonMember.value = nonMemberData.data || []
     rawMember.value = memberData.data || []
 
-    const nm = (nonMemberData.data || []).map((t: any) => ({
-      id: t.id,
-      type: 'non-member',
-      token: t.token,
-      vehicle: `${t.vehicle_category} · ${t.plate_number}`,
-      amount: t.fee,
-      time: t.exit_at || t.entry_at,
-      invoice_number: t.invoice_number,
-    }))
+    if (activityRes.status === 'fulfilled' && activityRes.value?.data) {
+      recentTransactions.value = activityRes.value.data
+    } else {
+      // Fallback jika endpoint activity gagal
+      const nm = (nonMemberData.data || []).map((t: any) => ({
+        id: 't-' + t.id,
+        type: 'non_member',
+        token: t.token,
+        plate_number: t.plate_number,
+        vehicle_category: t.vehicle_category,
+        fee: t.fee,
+        entry_at: t.entry_at,
+        exit_at: t.exit_at,
+        status: t.status,
+      }))
 
-    const mb = (memberData.data || []).map((b: any) => ({
-      id: b.id,
-      type: 'member',
-      token: null,
-      vehicle: `${b.member?.vehicle_category ?? '-'} · ${b.member?.name ?? '-'}`,
-      amount: b.amount,
-      time: b.paid_at,
-      invoice_number: b.invoice_number,
-    }))
+      const mb = (memberData.data || []).map((b: any) => ({
+        id: 'm-' + b.id,
+        type: 'member',
+        token: b.member?.member_code,
+        plate_number: b.member?.plate_number,
+        vehicle_category: b.member?.vehicle_category,
+        fee: 0,
+        entry_at: b.paid_at,
+        exit_at: b.paid_at,
+        status: 'paid',
+      }))
 
-    recentTransactions.value = [...nm, ...mb]
-      .sort((a, b) => new Date(b.time || 0).getTime() - new Date(a.time || 0).getTime())
-      .slice(0, 8)
+      recentTransactions.value = [...nm, ...mb]
+        .sort((a, b) => new Date(b.entry_at || 0).getTime() - new Date(a.entry_at || 0).getTime())
+        .slice(0, 15)
+    }
   } catch (e) {
     console.error('Error loadData dashboard:', e)
   } finally {
@@ -555,5 +640,15 @@ async function loadData() {
   }
 }
 
-onMounted(loadData)
+onMounted(() => {
+  loadData()
+  // Auto-refresh setiap 5 detik agar saat ada kendaraan baru masuk langsung terdeteksi
+  pollTimer = setInterval(() => {
+    loadData(true)
+  }, 5000)
+})
+
+onUnmounted(() => {
+  if (pollTimer) clearInterval(pollTimer)
+})
 </script>

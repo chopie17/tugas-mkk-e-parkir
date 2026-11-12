@@ -42,13 +42,19 @@ class MemberController extends Controller
      */
     public function index(Request $request): JsonResponse
     {
-        $query = Member::query()->with('creator');
+        $query = Member::query()->with([
+            'creator',
+            'bills' => fn($q) => $q->latest('period')->limit(5),
+        ]);
 
         if ($request->filled('search')) {
             $s = $request->string('search');
             $query->where(fn($q) => $q->where('name', 'like', "%{$s}%")
+                ->orWhere('company_name', 'like', "%{$s}%")
                 ->orWhere('plate_number', 'like', "%{$s}%")
-                ->orWhere('member_code', 'like', "%{$s}%"));
+                ->orWhere('member_code', 'like', "%{$s}%")
+                ->orWhere('phone_number', 'like', "%{$s}%")
+                ->orWhere('email', 'like', "%{$s}%"));
         }
 
         if ($request->has('is_active')) {

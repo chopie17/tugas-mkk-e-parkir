@@ -3,24 +3,14 @@
     <!-- Header -->
     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
       <div>
-        <h1 class="text-2xl font-black tracking-tight text-[#0a0a0a]">Terminal Kasir & Gate</h1>
-        <p class="text-xs text-[var(--nb-muted)] mt-1 font-medium">Kasir tiket non-member dan verifikasi gate scan member dalam satu terminal</p>
+        <h1 class="text-2xl font-black tracking-tight text-[#0a0a0a]">Terminal Kasir & Gate Keluar</h1>
+        <p class="text-xs text-[var(--nb-muted)] mt-1 font-medium">Pembayaran kasir keluar tiket non-member dan verifikasi gate keluar member</p>
       </div>
       <div class="flex items-center gap-2">
-        <button
-          class="nb-btn bg-[var(--nb-lime)] text-[#0a0a0a] font-bold border-2 border-black shadow-[3px_3px_0_#0a0a0a] hover:bg-[#d4f028]"
-          @click="issueTicket"
-          :disabled="issuingTicket"
-        >
-          <svg v-if="issuingTicket" class="w-4 h-4 animate-spin text-black" fill="none" viewBox="0 0 24 24">
-            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
-            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
-          </svg>
-          <span v-else class="flex items-center gap-2">
-            <AppIcon name="printer" class="w-4 h-4" />
-            <span>Cetak Tiket Masuk Baru</span>
-          </span>
-        </button>
+        <div class="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-white border-2 border-black shadow-[2px_2px_0_#0a0a0a] text-xs font-bold text-black">
+          <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 border border-black animate-pulse"></span>
+          <span>Pos Kasir & Gate Keluar Aktif</span>
+        </div>
       </div>
     </div>
 
@@ -29,51 +19,6 @@
 
       <!-- LEFT: Kasir Non-Member -->
       <div class="space-y-4">
-        <!-- Newly Issued Ticket Preview -->
-        <div v-if="newTicket" class="nb-card bg-[var(--nb-teal)]/20 p-5 border-2 border-black shadow-[4px_4px_0_#0a0a0a]">
-          <div class="flex items-center justify-between pb-3 border-b-2 border-black mb-4">
-            <div class="flex items-center gap-2">
-              <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 border border-black animate-pulse"></span>
-              <span class="text-xs font-bold uppercase tracking-wider text-black">Tiket Masuk Siap Cetak</span>
-            </div>
-            <button class="p-1 text-black hover:bg-black/10 rounded-md" @click="newTicket = null">
-              <AppIcon name="close" class="w-4 h-4" />
-            </button>
-          </div>
-          <div class="bg-white text-black p-4 rounded-xl border-2 border-black shadow-[3px_3px_0_#0a0a0a] max-w-xs mx-auto font-mono text-xs">
-            <div class="text-center pb-3 border-b border-dashed border-black/40">
-              <p class="font-black text-sm tracking-tight text-black font-sans">E-PARKIR PLAZA ANDALAS</p>
-              <p class="text-[10px] text-black/60 font-sans">Sistem Manajemen Parkir Resmi</p>
-            </div>
-            <div class="py-3 text-center">
-              <p class="text-[10px] text-black/60 uppercase tracking-widest font-sans font-bold">KODE TIKET MASUK</p>
-              <p class="text-2xl font-extrabold tracking-[0.2em] text-black my-1 font-mono">{{ newTicket.token }}</p>
-              <div class="h-7 my-1.5 flex items-center justify-center gap-0.5 opacity-80">
-                <span v-for="i in 28" :key="i" class="h-full bg-black inline-block" :style="{ width: (i % 3 === 0 ? '3px' : '1.5px') }"></span>
-              </div>
-            </div>
-            <div class="pt-2 border-t border-dashed border-black/40 space-y-1 text-[11px] text-black">
-              <div class="flex justify-between">
-                <span class="text-black/60">Waktu Masuk:</span>
-                <span class="font-bold">{{ formatDateTime(newTicket.entry_at) }}</span>
-              </div>
-              <div class="flex justify-between">
-                <span class="text-black/60">Status:</span>
-                <span class="font-bold text-emerald-700">AKTIF</span>
-              </div>
-            </div>
-          </div>
-          <div class="mt-4 flex gap-2 max-w-xs mx-auto">
-            <button class="nb-btn bg-white text-black flex-1 text-xs font-bold border-2 border-black shadow-[2px_2px_0_#0a0a0a]" @click="printTicketMockup">
-              <AppIcon name="printer" class="w-3.5 h-3.5" />
-              <span>Cetak</span>
-            </button>
-            <button class="nb-btn bg-[var(--nb-lime)] text-black flex-1 text-xs font-bold border-2 border-black shadow-[2px_2px_0_#0a0a0a]" @click="loadToPayment(newTicket)">
-              <AppIcon name="credit-card" class="w-3.5 h-3.5" />
-              <span>Buka Kasir</span>
-            </button>
-          </div>
-        </div>
 
         <!-- Cashier / Search Card -->
         <div class="nb-card bg-white border-2 border-black p-5 shadow-[4px_4px_0_#0a0a0a] space-y-5">
@@ -270,13 +215,13 @@
                 <AppIcon name="scan" class="w-4 h-4 text-white" />
               </div>
               <div>
-                <h2 class="text-sm font-black text-black">Gate Scan Member</h2>
-                <p class="text-[11px] text-[var(--nb-muted)]">Verifikasi QR / barcode kartu member</p>
+                <h2 class="text-sm font-black text-black">Gate Keluar Member</h2>
+                <p class="text-[11px] text-[var(--nb-muted)]">Verifikasi scan kartu member keluar (Bebas Biaya / Rp 0)</p>
               </div>
             </div>
             <div class="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[var(--nb-lime)] border-2 border-black shadow-[1.5px_1.5px_0_#0a0a0a] text-[11px] text-black font-mono font-black">
               <span class="w-2 h-2 rounded-full bg-emerald-600 animate-ping"></span>
-              <span>GATE 01</span>
+              <span>GATE OUT 01</span>
             </div>
           </div>
 
@@ -542,19 +487,20 @@ async function issueTicket() {
 }
 
 async function findTicket() {
-  if (!searchToken.value.trim()) return
+  const token = searchToken.value.trim().toUpperCase()
+  if (!token) return
   finding.value = true
   findError.value = ''
   foundTicket.value = null
   preview.value = null
   try {
-    const data = await apiFetch<any>(`/tickets/${searchToken.value.trim()}`)
+    const data = await apiFetch<any>(`/tickets/${token}`)
     foundTicket.value = data.ticket
     if (data.ticket.status === 'active' && payForm.vehicle_category) {
       await refreshPreview()
     }
   } catch (e: any) {
-    findError.value = e?.data?.message ?? 'Tiket tidak ditemukan dalam sistem'
+    findError.value = e?.data?.message ?? `Tiket parkir dengan kode '${token}' tidak ditemukan dalam sistem.`
   } finally {
     finding.value = false
   }
@@ -621,7 +567,10 @@ async function doScan() {
   try {
     const data = await apiFetch<any>('/members/scan', {
       method: 'POST',
-      body: { member_code: scanCode.value.trim().toUpperCase() },
+      body: {
+        member_code: scanCode.value.trim().toUpperCase(),
+        direction: 'out',
+      },
     })
     scanResult.value = data
     addScanHistory(scanCode.value, data)

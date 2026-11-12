@@ -8,6 +8,7 @@ use App\Enums\TicketStatus;
 use App\Enums\VehicleCategory;
 use App\Exceptions\Domain\InsufficientCashException;
 use App\Exceptions\Domain\TicketAlreadyPaidException;
+use App\Exceptions\Domain\TicketNotFoundException;
 use App\Models\ParkingTicket;
 use App\Models\User;
 use Carbon\Carbon;
@@ -48,11 +49,18 @@ class TicketService
      *
      * @param string $token
      * @return ParkingTicket
-     * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
+     * @throws TicketNotFoundException Jika tiket tidak ditemukan
      */
     public function findByToken(string $token): ParkingTicket
     {
-        return ParkingTicket::where('token', strtoupper(trim($token)))->firstOrFail();
+        $normalized = strtoupper(trim($token));
+        $ticket = ParkingTicket::where('token', $normalized)->first();
+
+        if (!$ticket) {
+            throw new TicketNotFoundException($normalized);
+        }
+
+        return $ticket;
     }
 
     /**

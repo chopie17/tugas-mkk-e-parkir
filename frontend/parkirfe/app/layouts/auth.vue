@@ -14,11 +14,11 @@
 
       <div class="flex items-center gap-2">
         <NuxtLink
-          to="/"
+          to="/login"
           class="nb-btn nb-btn-sm bg-white flex items-center gap-1.5"
         >
-          <AppIcon name="gate" class="w-3.5 h-3.5" />
-          <span>Kiosk Masuk</span>
+          <AppIcon name="user" class="w-3.5 h-3.5" />
+          <span>Masuk</span>
         </NuxtLink>
       </div>
     </header>

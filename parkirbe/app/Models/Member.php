@@ -19,6 +19,8 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property string          $member_code   Kode unik untuk QR kartu
  * @property string          $name
  * @property string          $plate_number
+ * @property string|null     $phone_number
+ * @property string|null     $email
  * @property VehicleCategory $vehicle_category
  * @property int             $monthly_fee
  * @property bool            $is_active
@@ -31,7 +33,10 @@ class Member extends Model
     protected $fillable = [
         'member_code',
         'name',
+        'company_name',
         'plate_number',
+        'phone_number',
+        'email',
         'vehicle_category',
         'monthly_fee',
         'is_active',

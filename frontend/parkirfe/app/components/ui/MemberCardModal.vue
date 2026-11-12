@@ -94,14 +94,19 @@
                 <div class="space-y-2 relative z-10 my-auto">
                   <div>
                     <p class="text-[9px] sm:text-[10px] text-slate-300 uppercase tracking-wider font-bold">NAMA PELANGGAN</p>
-                    <p class="text-base sm:text-xl font-black tracking-tight text-white font-sans truncate">{{ member.name }}</p>
+                    <div class="flex items-baseline justify-between gap-2">
+                      <p class="text-base sm:text-xl font-black tracking-tight text-white font-sans truncate">{{ member.name }}</p>
+                      <span v-if="member.phone_number" class="text-[9px] sm:text-[10px] font-mono font-bold text-emerald-300 shrink-0">
+                        📱 {{ member.phone_number }}
+                      </span>
+                    </div>
                   </div>
 
                   <div class="grid grid-cols-2 gap-2 pt-0.5">
                     <div>
-                      <p class="text-[9px] sm:text-[10px] text-slate-300 uppercase tracking-wider font-bold">PLAT NOMOR</p>
-                      <span class="inline-block mt-0.5 px-2.5 py-0.5 rounded bg-black font-mono font-black text-xs sm:text-sm text-[var(--nb-lime)] border border-black">
-                        {{ member.plate_number }}
+                      <p class="text-[9px] sm:text-[10px] text-slate-300 uppercase tracking-wider font-bold">PERUSAHAAN / INSTANSI</p>
+                      <span class="inline-block mt-0.5 px-2.5 py-0.5 rounded bg-black font-bold text-xs sm:text-sm text-[var(--nb-lime)] border border-black truncate max-w-[150px]" :title="member.company_name">
+                        {{ member.company_name || 'Member Resmi' }}
                       </span>
                     </div>
                     <div>
@@ -157,8 +162,8 @@
                   <!-- 1D Barcode & Plate Signature -->
                   <div class="flex-1 min-w-0 space-y-1">
                     <div class="flex items-center justify-between border-b-2 border-black/10 pb-1">
-                      <span class="text-[9px] font-mono font-black uppercase text-black/70">MEMBER CODE</span>
-                      <span class="text-[9px] font-mono font-black px-1.5 py-0.2 rounded bg-black text-white">{{ member.plate_number }}</span>
+                      <span class="text-[9px] font-mono font-black uppercase text-black/70">INSTANSI</span>
+                      <span class="text-[9px] font-mono font-black px-1.5 py-0.2 rounded bg-black text-white truncate max-w-[130px]">{{ member.company_name || 'Plaza Andalas' }}</span>
                     </div>
 
                     <!-- 1D Barcode Vector -->
@@ -329,13 +334,33 @@ const barcodeSvg = computed(() => {
   return generateBarcodeSVG(props.member.member_code, 38)
 })
 
-function copyCode() {
+async function copyCode() {
   if (!props.member?.member_code) return
-  navigator.clipboard.writeText(props.member.member_code)
-  copied.value = true
-  setTimeout(() => {
-    copied.value = false
-  }, 2000)
+  const text = props.member.member_code
+
+  try {
+    if (navigator?.clipboard?.writeText) {
+      await navigator.clipboard.writeText(text)
+    } else {
+      // Fallback untuk non-HTTPS / LAN IP (http://192.168.x.x)
+      const textArea = document.createElement('textarea')
+      textArea.value = text
+      textArea.style.position = 'fixed'
+      textArea.style.left = '-999999px'
+      textArea.style.top = '-999999px'
+      document.body.appendChild(textArea)
+      textArea.focus()
+      textArea.select()
+      document.execCommand('copy')
+      textArea.remove()
+    }
+    copied.value = true
+    setTimeout(() => {
+      copied.value = false
+    }, 2000)
+  } catch (err) {
+    console.error('Gagal menyalin kode member:', err)
+  }
 }
 
 function printCard() {

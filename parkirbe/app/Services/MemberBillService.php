@@ -7,11 +7,14 @@ namespace App\Services;
 use App\Enums\BillStatus;
 use App\Exceptions\Domain\BillAlreadyPaidException;
 use App\Exceptions\Domain\InsufficientCashException;
+use App\Mail\MemberBillReminderMail;
 use App\Models\Member;
 use App\Models\MemberBill;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 
 /**
  * MemberBillService mengelola tagihan bulanan member.
@@ -23,6 +26,7 @@ class MemberBillService
 {
     public function __construct(
         private readonly InvoiceNumberGenerator $invoiceGenerator,
+        private readonly FonnteService          $fonnteService,
     ) {}
 
     /**
@@ -131,5 +135,71 @@ class MemberBillService
     public function hasUnpaid(Member $member): bool
     {
         return $member->bills()->where('status', BillStatus::BelumLunas->value)->exists();
+    }
+
+    /**
+     * Mengirim pesan pengingat tagihan member via WhatsApp (Fonnte) dan/atau Email (SMTP).
+     * Dapat dipilih channel: 'auto' (otomatis yang tersedia), 'whatsapp', 'email', atau 'all'.
+     *
+     * @param MemberBill $bill
+     * @param string     $channel 'auto' | 'whatsapp' | 'email' | 'all'
+     * @return array{whatsapp: bool, email: bool, messages: string[]}
+     */
+    public function sendReminder(MemberBill $bill, string $channel = 'auto'): array
+    {
+        $bill->loadMissing('member');
+        $member = $bill->member;
+
+        $results = [
+            'whatsapp' => false,
+            'email'    => false,
+            'messages' => [],
+        ];
+
+        if (empty($member->phone_number) && empty($member->email)) {
+            $results['messages'][] = 'Member ini belum memiliki nomor telepon maupun alamat email.';
+            return $results;
+        }
+
+        $periodFormatted  = $bill->period ? Carbon::parse($bill->period)->translatedFormat('F Y') : date('F Y');
+        $nominalFormatted = 'Rp ' . number_format($bill->amount, 0, ',', '.');
+
+        $shouldSendWa    = in_array($channel, ['auto', 'whatsapp', 'all'], true);
+        $shouldSendEmail = in_array($channel, ['auto', 'email', 'all'], true);
+
+        // 1. Kirim via WhatsApp (Fonnte Gateway) jika dipilih & nomor tersedia
+        if ($shouldSendWa) {
+            if (!empty($member->phone_number)) {
+                $waMessage = "Halo Bpk/Ibu *{$member->name}*,\n\n"
+                    . "Masa berlaku kartu langganan parkir resmi Anda di *Plaza Andalas Padang* ({$member->member_code} - {$member->plate_number}) telah habis / menunggu perpanjangan iuran bulanan periode *{$periodFormatted}*.\n\n"
+                    . "Total iuran yang harus dibayar: *{$nominalFormatted}*.\n\n"
+                    . "Mohon datangi petugas kasir parkir Plaza Andalas untuk melakukan pembayaran perpanjangan agar akses gerbang otomatis tetap aktif.\n\n"
+                    . "_Pesan otomatis E-Parkir Plaza Andalas_";
+
+                $fonnteResult = $this->fonnteService->sendWhatsAppMessage($member->phone_number, $waMessage);
+                $results['whatsapp'] = $fonnteResult['success'];
+                $results['messages'][] = $fonnteResult['message'];
+            } elseif ($channel === 'whatsapp') {
+                $results['messages'][] = 'Nomor WhatsApp belum terdaftar pada profil member.';
+            }
+        }
+
+        // 2. Kirim via Email (SMTP) jika dipilih & email tersedia
+        if ($shouldSendEmail) {
+            if (!empty($member->email)) {
+                try {
+                    Mail::to($member->email)->send(new MemberBillReminderMail($member, $bill));
+                    $results['email'] = true;
+                    $results['messages'][] = "Email pengingat berhasil dikirim ke {$member->email}.";
+                } catch (\Throwable $e) {
+                    Log::error("[Reminder Email Gagal] {$member->email}: " . $e->getMessage());
+                    $results['messages'][] = "Gagal kirim email: " . $e->getMessage();
+                }
+            } elseif ($channel === 'email') {
+                $results['messages'][] = 'Alamat email belum terdaftar pada profil member.';
+            }
+        }
+
+        return $results;
     }
 }

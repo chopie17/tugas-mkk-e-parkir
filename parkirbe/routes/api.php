@@ -55,6 +55,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // ── Tiket Parkir Non-Member ───────────────────────────────────────────
     Route::prefix('tickets')->group(function () {
+        Route::get('/',                [TicketController::class, 'index']);   // Daftar semua tiket parkir
         Route::post('/',               [TicketController::class, 'issue']);   // Cetak tiket masuk
         Route::get('/{token}',         [TicketController::class, 'show']);    // Detail tiket by token
         Route::get('/{token}/preview', [TicketController::class, 'preview']); // Preview biaya
@@ -67,15 +68,17 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/members/{member}/bills', [MemberController::class, 'bills']); // Tagihan member
 
     // ── Tagihan Member ────────────────────────────────────────────────────
-    Route::get('/bills',              [BillController::class, 'index']); // Daftar tagihan
-    Route::get('/bills/{bill}',       [BillController::class, 'show']);  // Detail tagihan
-    Route::post('/bills/{bill}/pay',  [BillController::class, 'pay']);   // Bayar tagihan
+    Route::get('/bills',                 [BillController::class, 'index']);  // Daftar tagihan
+    Route::get('/bills/{bill}',          [BillController::class, 'show']);   // Detail tagihan
+    Route::post('/bills/{bill}/pay',     [BillController::class, 'pay']);    // Bayar tagihan
+    Route::post('/bills/{bill}/remind',  [BillController::class, 'remind']); // Kirim reminder WA & Email
 
     // ── Laporan Transaksi ─────────────────────────────────────────────────
     Route::prefix('reports')->group(function () {
-        Route::get('/non-member', [ReportController::class, 'nonMember']);
-        Route::get('/member',     [ReportController::class, 'member']);
-        Route::get('/summary',    [ReportController::class, 'summary']);
+        Route::get('/today-activity', [ReportController::class, 'todayActivity']); // Log aktivitas parkir hari ini (live)
+        Route::get('/non-member',     [ReportController::class, 'nonMember']);
+        Route::get('/member',         [ReportController::class, 'member']);
+        Route::get('/summary',        [ReportController::class, 'summary']);
     });
 
     // ── Super Admin Only ──────────────────────────────────────────────────

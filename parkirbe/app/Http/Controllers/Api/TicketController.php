@@ -9,6 +9,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Ticket\PayTicketRequest;
 use App\Http\Requests\Ticket\PreviewFeeRequest;
 use App\Http\Resources\ParkingTicketResource;
+use App\Models\ParkingTicket;
 use App\Services\TicketService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -16,6 +17,7 @@ use Illuminate\Http\Request;
 /**
  * TicketController mengelola tiket parkir non-member.
  *
+ * GET    /tickets                 → index (daftar tiket parkir)
  * POST   /tickets                 → issue (buat tiket baru)
  * GET    /tickets/{token}         → show (detail tiket)
  * GET    /tickets/{token}/preview → preview kalkulasi biaya
@@ -26,6 +28,44 @@ class TicketController extends Controller
     public function __construct(
         private readonly TicketService $ticketService,
     ) {}
+
+    /**
+     * Daftar tiket parkir.
+     *
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function index(Request $request): JsonResponse
+    {
+        $query = ParkingTicket::with('processor')->latest('entry_at');
+
+        if ($request->filled('status')) {
+            $query->where('status', $request->input('status'));
+        }
+
+        if ($request->filled('date')) {
+            $query->whereDate('entry_at', $request->input('date'));
+        }
+
+        if ($request->filled('search')) {
+            $search = $request->input('search');
+            $query->where(function ($q) use ($search) {
+                $q->where('token', 'like', "%{$search}%")
+                  ->orWhere('plate_number', 'like', "%{$search}%");
+            });
+        }
+
+        $tickets = $query->paginate(20);
+
+        return response()->json([
+            'data' => ParkingTicketResource::collection($tickets->items()),
+            'meta' => [
+                'current_page' => $tickets->currentPage(),
+                'last_page'    => $tickets->lastPage(),
+                'total'        => $tickets->total(),
+            ],
+        ]);
+    }
 
     /**
      * Membuat tiket parkir baru saat kendaraan masuk.

@@ -120,13 +120,12 @@ class AuthController extends Controller
 
         // Selalu kembalikan 200 agar tidak membocorkan info akun terdaftar
         return response()->json([
-            'message'      => 'Jika email terdaftar, token reset telah dikirim.',
-            'reset_token'  => $token, // DEMO ONLY — hapus di produksi
+            'message' => 'Kode OTP verifikasi telah dikirim ke alamat email Anda.',
         ]);
     }
 
     /**
-     * Langkah 2 — Reset password dengan token.
+     * Langkah 2 — Reset password dengan verifikasi kode OTP.
      *
      * @param ResetPasswordRequest $request
      * @return JsonResponse
@@ -141,10 +140,10 @@ class AuthController extends Controller
 
         if (!$success) {
             return response()->json([
-                'message' => 'Token tidak valid atau sudah kedaluwarsa.',
+                'message' => 'Kode OTP tidak valid atau sudah kedaluwarsa.',
             ], 422);
         }
 
-        return response()->json(['message' => 'Password berhasil direset.']);
+        return response()->json(['message' => 'Password berhasil direset. Silakan login.']);
     }
 }
